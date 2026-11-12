@@ -123,11 +123,11 @@ def main(src, out):
     courses = [
         two_patient_course(
             wb, "2026 RN INPATIENT",
-            {"id": "rn-inpatient", "name": "RN Inpatient / Ward", "group": "nursing", "barcode": True},
+            {"id": "rn-inpatient", "name": "RN Inpatient / Ward", "group": "nursing", "barcode": True, "bloodBag": True},
             ["Instructor led", "Proficiency"], "MED, Molly"),
         two_patient_course(
             wb, "2026 MIDWIFERY DAY 1 Trg & Prof",
-            {"id": "midwifery-day-1", "name": "Midwifery Day 1", "group": "midwifery", "barcode": True},
+            {"id": "midwifery-day-1", "name": "Midwifery Day 1", "group": "midwifery", "barcode": True, "bloodBag": True},
             ["Antenatal · Training", "Postnatal · Training"], "OBS, Olly"),
         ao_course(
             wb, "2026 AO ESM",

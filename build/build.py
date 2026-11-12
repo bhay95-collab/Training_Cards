@@ -34,11 +34,14 @@ def main():
     font_b64 = base64.b64encode(font.read_bytes()).decode()
 
     html = (ROOT / "src" / "index.html").read_text()
-    for marker in ("/*__DATA__*/", "/*__AZTEC__*/", "__INTER_WOFF2__"):
+    blood_b64 = base64.b64encode((ROOT / "assets" / "blood-bag.png").read_bytes()).decode()
+
+    for marker in ("/*__DATA__*/", "/*__AZTEC__*/", "__INTER_WOFF2__", "__BLOODBAG_PNG__"):
         assert html.count(marker) == 1, marker
     html = (html.replace("/*__AZTEC__*/", aztec_bundle().replace("</script", "<\\/script"))
                 .replace("/*__DATA__*/", data_js)
-                .replace("__INTER_WOFF2__", font_b64))
+                .replace("__INTER_WOFF2__", font_b64)
+                .replace("__BLOODBAG_PNG__", blood_b64))
 
     out = DIST / "TrainingCard.html"
     out.write_text(html)
