@@ -16,10 +16,10 @@ const GROUPS = [
 const ICONS = {
   heart: '<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z"/><path d="M7.5 11.5h2.5l1.2-2 1.8 4 1.2-2h2.3"/>',
   steth: '<path d="M6 3v5a4 4 0 0 0 8 0V3"/><path d="M10 12v3a5 5 0 0 0 10 0v-2"/><circle cx="20" cy="11" r="2"/>',
-  baby:  '<circle cx="12" cy="7.5" r="3.5"/><path d="M5.5 21c0-4 2.9-7 6.5-7s6.5 3 6.5 7"/><path d="M10.5 7.5h.01M13.5 7.5h.01"/>',
+  baby:  '<circle cx="9" cy="5" r="2.6"/><path d="M4.5 21v-5.5A4.5 4.5 0 0 1 9 11h1.5"/><circle cx="15.6" cy="10.6" r="2.1"/><path d="M8 15.5c1.6 2.2 4.5 3.2 7.4 3 2.6-.2 4.4-1.6 4.6-3.6.1-1.2-.6-2-1.7-2.3"/><path d="M12.2 15.2c.6.9 1.7 1.4 3 1.4"/>',
   clip:  '<rect x="5" y="4" width="14" height="17" rx="2.5"/><path d="M9 4V3h6v1"/><path d="M9 10h6M9 14h6M9 18h3"/>',
   pill:  '<rect x="3.5" y="8.5" width="17" height="7" rx="3.5" transform="rotate(-35 12 12)"/><path d="m10 9 4.2 6"/>',
-  hand:  '<circle cx="12" cy="4.5" r="2"/><path d="M5 8.5h14M12 8.5V14m0 0-3.5 7M12 14l3.5 7"/>',
+  hand:  '<path d="M12 11.2s-4-2.4-4-5.3a2.2 2.2 0 0 1 4-1.3 2.2 2.2 0 0 1 4 1.3c0 2.9-4 5.3-4 5.3Z"/><path d="M2.5 15.5h3.2l3.6-1.4c.9-.3 1.9 0 2.4.7l.3.5h3.3a1.6 1.6 0 0 1 0 3.2H11"/><path d="m15.3 18.5 4.4-2.9a1.5 1.5 0 0 1 1.8 2.4l-5.6 3.8c-.6.4-1.3.5-2 .4L5.7 21H2.5"/>',
 };
 const icon = (name, sw = 1.7) =>
   `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[name]}</svg>`;
