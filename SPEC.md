@@ -41,6 +41,20 @@ Replaces the Excel "Digital Training Card – Trainee Copy v2.0" with one web pa
 - **Light mode only.**
 - **Subtle motion** (<0.3s): tile hover lift, card fade/slide in. Respects Windows reduce-motion.
 
+## Decisions after preview review
+- **Half-screen first**: two PCs share one monitor (~950 x 900 each). Card must show login, patients and other logins without scrolling.
+- **Blood bag barcode**: fixed image A530-024-0384 (copied from the old card). On every course except Admin. Per-course Yes/No.
+- **Course complete**: nav button + banner. "Has your trainer signed you off?" Yes -> opens ServiceNow access form (same link for all courses, overridable per course). No -> "Chat with your trainer".
+- **Pharmacy**: one card, Part A (pharmacist) and Part B (doctor login + patients) as sections. Searching the Part B login finds the card.
+- **MO ObGyn**: tabs "Instructor led" / "Proficiency", 3 patients each.
+- **MO Anaesthetist**: tabs "Training & Proficiency" / "Blank Record".
+- **PEMR**: IOMS shown.
+- **AO HBCIS**: logins repeat per facility (TR20 at RBWH and TPCH); unique key = login + facility.
+- **Admin users**: a few non-technical people -> guided 4-step screen, plain-English problems, changes table, "Try it" before saving.
+- **Admin shortcut**: Ctrl + Alt + U (Edge uses Ctrl + Shift + U for Read Aloud), or click "Data updated" in the footer 5 times.
+
 ## Open
-- Who updates data, how often.
-- Do training PCs reset on reboot? (affects any "remember this PC" feature — not in scope yet)
+- How often data is updated (designed for occasional use).
+- Do training PCs reset on reboot? (affects any "remember this PC" feature — not in scope)
+- What the Anaesthetist "Blank Record" set is for (tab has no hint yet).
+- AO FirstNet ED HBCIS DOB is a fixed 01-Jan-2000, copied from the old card.

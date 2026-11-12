@@ -137,10 +137,10 @@ button { font: inherit; color: inherit; letter-spacing: inherit; }
 .h2 span { color: var(--text-3); }
 
 /* ---------- Profession tiles ---------- */
-.professions { display: flex; gap: 12px; flex-wrap: wrap; }
+.professions { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; max-width: 960px; }
 .prof {
   display: flex; flex-direction: column; align-items: center; gap: 14px;
-  width: 148px; padding: 8px 4px 14px; border: 0; background: none; cursor: pointer;
+  width: 100%; padding: 8px 4px 14px; border: 0; background: none; cursor: pointer;
   border-radius: var(--radius-md);
 }
 .prof .icon {
@@ -160,10 +160,10 @@ button { font: inherit; color: inherit; letter-spacing: inherit; }
 .prof[aria-pressed="true"] .icon { box-shadow: 0 0 0 3px var(--bg), 0 0 0 5px var(--ink); }
 
 /* ---------- Course cards ---------- */
-.courses { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+.courses { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
 .course {
   position: relative; overflow: hidden;
-  min-height: 280px; padding: 30px; border: 0; text-align: left; cursor: pointer;
+  min-height: 210px; padding: 26px; border: 0; text-align: left; cursor: pointer;
   background: var(--tile); border-radius: var(--radius-lg);
   display: flex; flex-direction: column;
   transition: transform .3s var(--ease-out), box-shadow .3s var(--ease-out);
@@ -171,9 +171,9 @@ button { font: inherit; color: inherit; letter-spacing: inherit; }
 }
 .course:hover { transform: translateY(-4px) scale(1.01); box-shadow: var(--shadow-md); }
 .course .eyebrow { font-size: 12px; font-weight: 600; letter-spacing: .02em; text-transform: uppercase; color: var(--ink); }
-.course .title { margin-top: 8px; font-size: 30px; line-height: 1.1; font-weight: 700; letter-spacing: -0.025em; }
+.course .title { margin-top: 6px; font-size: 26px; line-height: 1.1; font-weight: 700; letter-spacing: -0.025em; }
 .course .meta { margin-top: 12px; font-size: 17px; color: rgba(29,29,31,.78); }
-.course .art { position: absolute; right: -18px; bottom: -22px; width: 150px; height: 150px; color: var(--ink); opacity: .16; }
+.course .art { position: absolute; right: -14px; bottom: -18px; width: 100px; height: 100px; color: var(--ink); opacity: .16; }
 .course .cta { margin-top: auto; font-size: 15px; font-weight: 600; color: var(--ink); }
 .course[aria-pressed="true"] { box-shadow: 0 0 0 3px var(--bg), 0 0 0 6px var(--ink); }
 
@@ -337,6 +337,88 @@ dialog.modal::backdrop { background: rgba(0,0,0,.32); backdrop-filter: blur(6px)
 .modal p { margin: 8px 0 0; color: var(--text-2); }
 .modal .actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; flex-wrap: wrap; }
 
+/* ---------- Card tabs and sections ---------- */
+.head-row { display: flex; align-items: center; justify-content: space-between; gap: 10px 16px; flex-wrap: wrap; margin-bottom: 12px; }
+.head-row .h3, .head-row .system-label { margin: 0; }
+.seg { display: inline-flex; gap: 2px; padding: 3px; background: #e3e3e8; border-radius: 12px; }
+.seg button {
+  border: 0; background: transparent; height: 34px; padding: 0 16px; border-radius: 9px; cursor: pointer;
+  font-size: 15px; font-weight: 500; color: var(--text-2);
+  transition: background .2s var(--ease), color .2s var(--ease), box-shadow .2s var(--ease);
+}
+.seg button:hover { color: var(--text); }
+.seg button[aria-selected="true"] { background: #fff; color: var(--text); font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,.12); }
+.patients.three { grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); }
+.psection + .psection { margin-top: 20px; }
+.psection-head { display: flex; align-items: center; justify-content: space-between; gap: 10px 16px; flex-wrap: wrap; margin-bottom: 10px; }
+.psection-head h3 { margin: 0; font-size: 19px; font-weight: 700; letter-spacing: -0.02em; color: var(--ink); }
+.mini-creds { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+.psection-head .mini-creds { margin-bottom: 0; }
+.mini-cred { display: flex; align-items: center; gap: 8px; background: var(--surface); border-radius: 12px; box-shadow: var(--shadow-sm); padding: 4px 4px 4px 12px; font-size: 14px; }
+.mini-cred .k { color: var(--text-2); }
+.mini-cred .v { font-weight: 600; font-size: 15px; }
+.hbcis.solo { max-width: 560px; }
+
+/* ---------- Admin ---------- */
+#admin .wrap { max-width: 880px; }
+.admin-head { padding: 28px 0 24px; }
+.admin-head h1 { margin: 0; font-size: clamp(40px, 5vw, 56px); font-weight: 700; letter-spacing: -0.035em; color: var(--navy); }
+.admin-head p { margin: 8px 0 0; color: var(--text-2); font-size: 19px; }
+.now { display: flex; gap: 12px 32px; flex-wrap: wrap; background: var(--surface); border-radius: 20px; padding: 18px 24px; box-shadow: var(--shadow-sm); margin-bottom: 24px; }
+.now b { display: block; font-size: 24px; font-weight: 700; letter-spacing: -0.02em; }
+.now span { font-size: 13px; color: var(--text-2); }
+.step { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 0 18px; background: var(--surface); border-radius: 24px; padding: 24px; box-shadow: var(--shadow-sm); margin-bottom: 16px; transition: opacity .2s var(--ease); }
+.step .n { width: 44px; height: 44px; border-radius: 50%; background: var(--navy); color: #fff; display: grid; place-items: center; font-weight: 700; font-size: 18px; }
+.step.locked { opacity: .5; }
+.step h2 { margin: 8px 0 4px; font-size: 21px; font-weight: 700; letter-spacing: -0.02em; }
+.step p, .step li { color: var(--text-2); font-size: 16px; margin: 0; }
+.step li + li { margin-top: 4px; }
+.step li b { color: var(--text); }
+.step ul { margin: 6px 0 0; padding-left: 20px; }
+.step .actions { margin-top: 16px; display: flex; gap: 10px; flex-wrap: wrap; }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.drop {
+  position: relative; display: block; margin-top: 16px; padding: 28px; text-align: center; cursor: pointer;
+  border: 2px dashed var(--line); border-radius: 18px; transition: border-color .2s var(--ease), background .2s var(--ease);
+}
+.drop:hover, .drop.over { border-color: var(--teal); background: #f0f8f9; }
+.drop:focus-within { border-color: var(--teal); }
+.drop b { display: block; font-size: 17px; color: var(--teal); }
+.drop span { font-size: 14px; color: var(--text-2); }
+.drop input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.verdict { margin-top: 16px; border-radius: 16px; padding: 16px 18px; display: flex; gap: 14px; align-items: flex-start; }
+.verdict.ok { background: #e5f4ea; color: #14532d; }
+.verdict.bad { background: #fdeaea; color: #7f1d1d; }
+.verdict.busy { background: var(--bg); color: var(--text-2); }
+.verdict b { display: block; font-size: 17px; }
+.verdict span { font-size: 15px; }
+.verdict svg { flex: none; width: 26px; height: 26px; margin-top: 1px; }
+.sub-h { margin: 20px 0 8px; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .03em; color: var(--text-2); }
+.issues { display: flex; flex-direction: column; gap: 6px; }
+.issue { display: grid; grid-template-columns: 76px minmax(0, 1fr); gap: 2px 12px; padding: 10px 14px; border-radius: 12px; background: var(--bg); font-size: 15px; }
+.issue .lvl { font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .03em; padding-top: 2px; }
+.issue.error .lvl { color: #b42318; }
+.issue.warning .lvl { color: #8a5a00; }
+.issue.info .lvl { color: var(--text-3); }
+.issue .where { font-weight: 600; }
+.issue .msg { grid-column: 2; color: var(--text-2); }
+.changes { width: 100%; border-collapse: collapse; font-size: 15px; }
+.changes th, .changes td { text-align: left; padding: 8px 10px; border-bottom: 1px solid #ececf0; }
+.changes th { font-size: 12px; color: var(--text-2); font-weight: 600; text-transform: uppercase; letter-spacing: .02em; }
+.changes td.n { text-align: right; font-variant-numeric: tabular-nums; }
+.plus { color: #1f8a4c; font-weight: 600; }
+.changes .muted { color: var(--text-3); }
+.minus { color: #b42318; font-weight: 600; }
+details.more summary { cursor: pointer; color: var(--teal); font-size: 15px; margin-top: 8px; }
+details.more .issues { margin-top: 8px; }
+.saved { margin-top: 14px; padding: 14px 16px; border-radius: 14px; background: #e5f4ea; color: #14532d; font-size: 15px; }
+.preview-bar {
+  position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); z-index: 40;
+  display: flex; align-items: center; gap: 10px; padding: 8px 8px 8px 20px; max-width: calc(100vw - 32px);
+  background: rgba(29,29,31,.94); color: #fff; border-radius: 999px; box-shadow: var(--shadow-md); font-size: 15px;
+}
+.preview-bar .btn { height: 36px; font-size: 14px; padding: 0 16px; }
+
 /* ---------- Footer ---------- */
 footer { border-top: 1px solid var(--line); padding: 20px 0 40px; color: var(--text-3); font-size: 12px; }
 footer .wrap { display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
@@ -380,7 +462,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 20px; flex-wr
   .hero-side { text-align: left; }
   .cred { flex: 1; }
   .patients { grid-template-columns: 1fr; }
-  .prof { width: 104px; }
+  .professions { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .prof .icon { width: 80px; height: 80px; border-radius: 22px; }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -449,6 +531,69 @@ footer .wrap { display: flex; justify-content: space-between; gap: 20px; flex-wr
   <div id="card" hidden>
     <div class="wrap" id="card-body"></div>
   </div>
+
+  <!-- Admin: Update data (Ctrl + Alt + U). Trainees never see this. -->
+  <div id="admin" hidden>
+    <div class="wrap">
+      <div class="card-top"><button class="back" type="button" id="admin-close">‹ Back to Training Card</button></div>
+      <header class="admin-head">
+        <h1>Update data</h1>
+        <p>For training coordinators. Trainees never see this screen.</p>
+      </header>
+      <div class="now" id="admin-now"></div>
+
+      <section class="step">
+        <div class="n">1</div>
+        <div>
+          <h2>Download the spreadsheet</h2>
+          <p>Get everything on this Training Card as an Excel file. Always start from this file so nothing gets lost.</p>
+          <div class="actions"><button class="btn primary" type="button" id="export">Download current data</button></div>
+        </div>
+      </section>
+
+      <section class="step">
+        <div class="n">2</div>
+        <div>
+          <h2>Make your changes in Excel</h2>
+          <ul>
+            <li>Each course has its own tab. <b>One row = one login.</b></li>
+            <li>Add, remove or change logins and patients. Leave columns you don't need empty.</li>
+            <li>The <b>Read me</b> tab explains every column. Don't rename the headings in row 1.</li>
+            <li>Save it as an Excel file (.xlsx).</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="step">
+        <div class="n">3</div>
+        <div>
+          <h2>Load your updated spreadsheet</h2>
+          <p>The Training Card checks it and explains anything that needs fixing.</p>
+          <label class="drop" id="drop">
+            <input type="file" id="file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+            <b>Choose your spreadsheet</b><span>or drag it here</span>
+          </label>
+          <div id="report"></div>
+        </div>
+      </section>
+
+      <section class="step locked" id="step4">
+        <div class="n">4</div>
+        <div>
+          <h2>Try it, then save</h2>
+          <p><b>Try it</b> shows the new data in this window only. <b>Save new Training Card</b> downloads the new file.</p>
+          <div class="actions">
+            <button class="btn secondary" type="button" id="try" disabled>Try it</button>
+            <button class="btn primary" type="button" id="save" disabled>Save new Training Card</button>
+          </div>
+          <div class="saved" id="saved" hidden>
+            Saved as <b>TrainingCard.html</b> in your Downloads folder. Copy it onto the desktop of each training PC, replacing the old TrainingCard.html. Keep your spreadsheet somewhere safe for next time.
+          </div>
+        </div>
+      </section>
+      <div style="height:48px"></div>
+    </div>
+  </div>
 </main>
 
 <footer>
@@ -459,6 +604,11 @@ footer .wrap { display: flex; justify-content: space-between; gap: 20px; flex-wr
 </footer>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="preview-bar" id="preview-bar" hidden>
+  <span>Trying new data. Not saved yet.</span>
+  <button class="btn light" type="button" id="pv-save">Save new Training Card</button>
+  <button class="btn secondary" type="button" id="pv-discard">Discard</button>
+</div>
 
 <dialog class="modal" id="complete" aria-labelledby="complete-title">
   <div data-step="ask">
@@ -490,468 +640,8 @@ footer .wrap { display: flex; justify-content: space-between; gap: 20px; flex-wr
 </dialog>
 
 
-<script>/*__AZTEC__*/</script>
-<script>
-const DATA = /*__DATA__*/;
-
-const GROUPS = [
-  { id: "nursing",   name: "Nursing",       icon: "heart" },
-  { id: "medical",   name: "Medical",       icon: "steth" },
-  { id: "midwifery", name: "Midwifery",     icon: "baby" },
-  { id: "admin",     name: "Admin",         icon: "clip" },
-  { id: "pharmacy",  name: "Pharmacy",      icon: "pill" },
-  { id: "allied",    name: "Allied Health", icon: "hand" },
-];
-
-const ICONS = {
-  heart: '<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z"/><path d="M7.5 11.5h2.5l1.2-2 1.8 4 1.2-2h2.3"/>',
-  steth: '<path d="M6 3v5a4 4 0 0 0 8 0V3"/><path d="M10 12v3a5 5 0 0 0 10 0v-2"/><circle cx="20" cy="11" r="2"/>',
-  baby:  '<circle cx="12" cy="7.5" r="3.5"/><path d="M5.5 21c0-4 2.9-7 6.5-7s6.5 3 6.5 7"/><path d="M10.5 7.5h.01M13.5 7.5h.01"/>',
-  clip:  '<rect x="5" y="4" width="14" height="17" rx="2.5"/><path d="M9 4V3h6v1"/><path d="M9 10h6M9 14h6M9 18h3"/>',
-  pill:  '<rect x="3.5" y="8.5" width="17" height="7" rx="3.5" transform="rotate(-35 12 12)"/><path d="m10 9 4.2 6"/>',
-  hand:  '<circle cx="12" cy="4.5" r="2"/><path d="M5 8.5h14M12 8.5V14m0 0-3.5 7M12 14l3.5 7"/>',
-};
-const icon = (name, sw = 1.7) =>
-  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[name]}</svg>`;
-const COPY_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2.5"/><path d="M16 8V6.5A2.5 2.5 0 0 0 13.5 4h-7A2.5 2.5 0 0 0 4 6.5v7A2.5 2.5 0 0 0 6.5 16H8"/></svg>';
-const TICK_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>';
-
-const $ = (s, el = document) => el.querySelector(s);
-const esc = (s) => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-const groupOf = (id) => GROUPS.find(g => g.id === id);
-
-// Only courses that actually have logins are shown.
-const COURSES = DATA.courses.filter(c => c.logins.length);
-const courseById = Object.fromEntries(COURSES.map(c => [c.id, c]));
-
-// Which optional fields a course uses at all (so empty columns don't clutter cards).
-for (const c of COURSES) {
-  const has = (f) => c.logins.some(l => l.patients.some(p => p[f]));
-  c.has = { ward: has("ward"), dob: has("dob"), mrn: has("mrn") };
-  c.facilities = [...new Set(c.logins.map(l => l.facility).filter(Boolean))].sort();
-  c.logins.sort((a, b) => a.login.localeCompare(b.login, undefined, { numeric: true }));
-}
-
-// login -> [{course, login}]
-const INDEX = new Map();
-for (const c of COURSES) for (const l of c.logins) {
-  const k = l.login.toUpperCase();
-  if (!INDEX.has(k)) INDEX.set(k, []);
-  INDEX.get(k).push({ c, l });
-}
-
-/* ---------------- Routing ---------------- */
-// #/            home
-// #/g/<group>   profession chosen
-// #/c/<course>  course chosen, logins shown
-// #/c/<course>/<login>  the card
-const state = { facility: "" };
-
-function go(hash) { if (location.hash !== hash) location.hash = hash; else route(); }
-
-function route() {
-  const parts = location.hash.replace(/^#\/?/, "").split("/").filter(Boolean).map(decodeURIComponent);
-  closeOverlay();
-  if (parts[0] === "c" && courseById[parts[1]]) {
-    const c = courseById[parts[1]];
-    if (parts[2]) {
-      const l = c.logins.find(x => x.login.toUpperCase() === parts[2].toUpperCase());
-      if (l) return showCard(c, l);
-    }
-    return showBrowse(c.group, c);
-  }
-  if (parts[0] === "g" && groupOf(parts[1])) return showBrowse(parts[1], null);
-  showBrowse(null, null);
-}
-
-/* ---------------- Browse ---------------- */
-let lastScrollTarget = null;
-
-function showBrowse(groupId, course) {
-  $("#card").hidden = true;
-  $("#nav-note").hidden = false;
-  $("#complete-open").hidden = true;
-  $("#browse").hidden = false;
-  renderProfessions(groupId);
-
-  const cs = $("#course-section");
-  if (groupId) {
-    cs.hidden = false;
-    const g = groupOf(groupId);
-    $("#course-title").innerHTML = `${esc(g.name)} courses. <span>Pick the one you're in today.</span>`;
-    renderCourses(groupId, course);
-  } else {
-    cs.hidden = true;
-  }
-
-  const ls = $("#login-section");
-  if (course) {
-    if (state.courseId !== course.id) { state.facility = ""; state.courseId = course.id; }
-    ls.hidden = false;
-    renderLogins(course);
-  } else {
-    ls.hidden = true;
-  }
-
-  const target = course ? ls : groupId ? cs : null;
-  const key = course ? "c:" + course.id : groupId ? "g:" + groupId : "home";
-  if (target && lastScrollTarget !== key) requestAnimationFrame(() => target.scrollIntoView({ block: "start" }));
-  if (!target && lastScrollTarget && lastScrollTarget !== "home") window.scrollTo({ top: 0 });
-  lastScrollTarget = key;
-}
-
-function renderProfessions(active) {
-  const live = GROUPS.filter(g => COURSES.some(c => c.group === g.id));
-  $("#professions").innerHTML = live.map(g => `
-    <button class="prof" type="button" data-group="${g.id}" aria-pressed="${g.id === active}">
-      <span class="icon">${icon(g.icon)}</span>
-      <span class="label">${esc(g.name)}</span>
-    </button>`).join("");
-}
-
-function renderCourses(groupId, active) {
-  const list = COURSES.filter(c => c.group === groupId);
-  const g = groupOf(groupId);
-  $("#courses").innerHTML = list.map((c, i) => {
-    const bits = [`${c.logins.length} logins`];
-    if (c.facilities.length > 1) bits.push(`${c.facilities.length} facilities`);
-    if (c.logins.some(l => l.hbcis)) bits.push("ieMR + HBCIS");
-    if (c.barcode) bits.push("ID band barcodes");
-    return `
-    <button class="course" type="button" data-group="${c.group}" data-course="${c.id}"
-            aria-pressed="${active && active.id === c.id}" style="animation-delay:${i * 50}ms">
-      <span class="eyebrow">${esc(g.name)}</span>
-      <span class="title">${esc(c.name)}</span>
-      <span class="meta">${esc(bits.join(" · "))}</span>
-      <span class="cta">Choose login ›</span>
-      <span class="art">${icon(g.icon, 1.2)}</span>
-    </button>`;
-  }).join("");
-}
-
-function renderLogins(c) {
-  const chips = $("#chips");
-  if (c.facilities.length > 1) {
-    const all = ["", ...c.facilities];
-    chips.hidden = false;
-    chips.innerHTML = all.map(f =>
-      `<button class="chip" type="button" data-facility="${esc(f)}" aria-pressed="${state.facility === f}">${f ? esc(f) : "All"}</button>`
-    ).join("");
-  } else {
-    chips.hidden = true;
-    chips.innerHTML = "";
-  }
-  const list = c.logins.filter(l => !state.facility || l.facility === state.facility);
-  const showFac = c.facilities.length > 1 && !state.facility;
-  $("#logins").innerHTML = list.map((l, i) => `
-    <button class="login-tile num" type="button" data-login="${esc(l.login)}" style="animation-delay:${Math.min(i, 30) * 12}ms">
-      <span class="l">${esc(l.login)}</span>
-      ${showFac ? `<span class="f">${esc(l.facility)}</span>` : ""}
-    </button>`).join("");
-}
-
-$("#professions").addEventListener("click", e => {
-  const b = e.target.closest(".prof"); if (b) go("#/g/" + b.dataset.group);
-});
-$("#courses").addEventListener("click", e => {
-  const b = e.target.closest(".course"); if (b) go("#/c/" + b.dataset.course);
-});
-$("#chips").addEventListener("click", e => {
-  const b = e.target.closest(".chip"); if (!b) return;
-  state.facility = b.dataset.facility;
-  renderLogins(courseById[state.courseId]);
-});
-$("#logins").addEventListener("click", e => {
-  const b = e.target.closest(".login-tile"); if (b) go(`#/c/${state.courseId}/${encodeURIComponent(b.dataset.login)}`);
-});
-$("#home").addEventListener("click", () => go("#/"));
-
-/* ---------------- Card ---------------- */
-const DASH = '<span class="v muted">—</span>';
-const BLOOD_BAG = { src: "data:image/png;base64,__BLOODBAG_PNG__", number: "A530-024-0384" };
-const ACCESS_URL_DEFAULT = "https://qldhealth.service-now.com/ssp?id=sc_cat_item&sys_id=d1a06d86db4c0c10ac208a264a9619d6";
-
-function copyBtn(label, value) {
-  return `<button class="copy" type="button" data-copy="${esc(value)}" aria-label="Copy ${esc(label)}">${COPY_ICON}</button>`;
-}
-
-function row(label, value, opts = {}) {
-  const v = value ? `<span class="v ${opts.num ? "num" : ""}">${esc(value)}</span>` : DASH;
-  const btn = value && opts.copy !== false ? copyBtn(label, value) : "";
-  return `<div class="row"><span class="k">${esc(label)}</span>${v}${btn}</div>`;
-}
-
-function cred(label, value) {
-  return `<div class="cred"><div><span class="k">${esc(label)}</span><span class="v num">${esc(value || "—")}</span></div>${value ? copyBtn(label, value) : ""}</div>`;
-}
-
-function aztecSVG(text) {
-  try { return window.makeAztec(text); } catch (err) { return ""; }
-}
-
-function patientCard(c, p, i) {
-  const code = c.barcode && p.fin ? "AC" + p.fin : "";
-  const svg = code ? aztecSVG(code) : "";
-  const fullName = [p.last, p.first].filter(Boolean).join(", ");
-  const rows = [
-    c.has.mrn ? row("MRN", p.mrn, { num: true }) : "",
-    c.has.dob ? row("DOB", p.dob, { copy: false }) : "",
-    c.has.ward ? row("Ward", p.ward) : "",
-  ].join("");
-  return `
-  <article class="patient" style="animation-delay:${60 + i * 60}ms">
-    <div class="p-head">
-      <div>
-        <div class="eyebrow">Patient ${i + 1} · ${esc(p.role)}</div>
-        <div class="name"><span>${esc(p.last || "—")}</span>${p.last ? copyBtn("last name", p.last) : ""}</div>
-        ${p.first ? `<div class="first"><span>${esc(p.first)}</span>${copyBtn("first name", p.first)}</div>` : ""}
-      </div>
-      ${svg ? `
-      <button class="barcode" type="button" data-code="${esc(code)}" data-who="${esc(fullName)}" title="Click to enlarge" aria-label="Enlarge ID band barcode for ${esc(fullName)}">
-        ${svg}<span class="cap num">${esc(code)}</span>
-      </button>` : ""}
-    </div>
-    <div class="details">${rows}</div>
-  </article>`;
-}
-
-function showCard(c, l) {
-  state.courseId = c.id;
-  state.accessUrl = c.accessUrl || ACCESS_URL_DEFAULT;
-  const g = groupOf(c.group);
-  $("#browse").hidden = true;
-  $("#nav-note").hidden = true;
-  $("#complete-open").hidden = false;
-  const card = $("#card");
-  card.hidden = false;
-  card.dataset.group = c.group;
-
-  const compact = l.patients.length > 2 || !!l.hbcis;
-  const patients = l.patients.length
-    ? `<div class="patients ${compact ? "compact" : ""}">${l.patients.map((p, i) => patientCard(c, p, i)).join("")}</div>`
-    : `<div class="empty-state">No patients set up for this login yet.</div>`;
-
-  const hb = l.hbcis;
-  const hbcis = hb ? `
-    <div>
-      <h3 class="system-label">HBCIS <i>Second system</i></h3>
-      <div class="hbcis">
-        <div class="group-title">Login</div>
-        ${row("Login", hb.login, { num: true })}
-        ${row("Password", hb.password)}
-        <div class="group-title">Patient</div>
-        ${row("URN", hb.urn, { num: true })}
-        ${row("Last name", hb.last)}
-        ${row("First name", hb.first)}
-        ${row("DOB", hb.dob, { copy: false })}
-        ${row("Doctor", hb.doctor)}
-        ${row("Unit", hb.unit)}
-        ${row("Admit ward", hb.ward)}
-        ${row("Transfer to", hb.transfer)}
-      </div>
-    </div>` : "";
-
-  const otherCards = (l.others || []).map((o, i) => `
-    <div class="other" style="animation-delay:${180 + i * 50}ms">
-      <h3>${esc(o.label)}</h3><p>${esc(o.note)}</p>
-      ${row("Username", o.username)}
-      ${row("Password", o.password)}
-    </div>`);
-  if (c.bloodBag) otherCards.push(`
-    <div class="other" style="animation-delay:${180 + otherCards.length * 50}ms">
-      <h3>Blood bag</h3><p>Scan for blood product checks</p>
-      <button class="bloodbag" type="button" data-bloodbag title="Click to enlarge" aria-label="Enlarge blood bag barcode">
-        <img src="${BLOOD_BAG.src}" alt="Blood bag barcode ${BLOOD_BAG.number}">
-      </button>
-    </div>`);
-  const others = otherCards.length ? `
-    <section class="sub">
-      <h2 class="h3">Other logins. <span>For checks and orders.</span></h2>
-      <div class="others">${otherCards.join("")}</div>
-    </section>` : "";
-
-  $("#card-body").innerHTML = `
-    <div class="card-top"><button class="back" type="button" id="back">‹ ${esc(c.name)} logins</button></div>
-    <section class="card-head">
-      <div>
-        <div class="eyebrow">${esc(g.name)} · ${esc(c.name)}${l.facility && c.facilities.length > 1 ? " · " + esc(l.facility) : ""}</div>
-        <h1 class="num">${esc(l.login)}</h1>
-      </div>
-      <div class="creds">${cred("Login", l.login)}${cred("Password", l.password)}</div>
-    </section>
-
-    ${hb ? `
-    <div class="systems">
-      <div>
-        <h3 class="system-label">ieMR <i>Patients</i></h3>
-        ${patients}
-      </div>
-      ${hbcis}
-    </div>` : `
-    <section>
-      <h2 class="h3">Your patients. <span>Use these in ieMR today.</span></h2>
-      ${patients}
-    </section>`}
-
-    ${others}
-
-    <section class="complete">
-      <div>
-        <h3>Finished your training?</h3>
-        <p>Once your trainer signs you off, request your access here.</p>
-      </div>
-      <button class="btn light" type="button" data-complete>Course complete</button>
-    </section>
-    <div style="height:40px"></div>`;
-
-  $("#back").addEventListener("click", () => go("#/c/" + c.id));
-  lastScrollTarget = "card";
-  window.scrollTo({ top: 0 });
-}
-
-/* ---------------- Course complete ---------------- */
-const dlg = $("#complete");
-function openComplete() {
-  dlg.querySelectorAll("[data-step]").forEach(s => s.hidden = s.dataset.step !== "ask");
-  dlg.showModal();
-}
-document.addEventListener("click", e => {
-  if (e.target.closest("[data-complete], #complete-open")) openComplete();
-});
-dlg.addEventListener("click", e => {
-  if (e.target === dlg) return dlg.close();                // click on backdrop
-  const a = e.target.closest("[data-answer]");
-  if (a) {
-    if (a.dataset.answer === "yes") {
-      $("#access-link").href = state.accessUrl;
-      window.open(state.accessUrl, "_blank", "noopener");
-    }
-    dlg.querySelectorAll("[data-step]").forEach(s => s.hidden = s.dataset.step !== a.dataset.answer);
-  }
-  if (e.target.closest("[data-close]")) dlg.close();
-});
-
-/* ---------------- Copy ---------------- */
-const toast = $("#toast");
-let toastTimer;
-function showToast(msg) {
-  toast.textContent = msg;
-  toast.classList.add("show");
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => toast.classList.remove("show"), 1400);
-}
-async function copyText(text) {
-  try { await navigator.clipboard.writeText(text); return true; }
-  catch {
-    const ta = document.createElement("textarea");
-    ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
-    document.body.appendChild(ta); ta.select();
-    const ok = document.execCommand("copy"); ta.remove(); return ok;
-  }
-}
-document.addEventListener("click", async e => {
-  const b = e.target.closest(".copy"); if (!b) return;
-  if (await copyText(b.dataset.copy)) {
-    b.classList.add("done"); b.innerHTML = TICK_ICON;
-    showToast(`Copied ${b.dataset.copy}`);
-    setTimeout(() => { b.classList.remove("done"); b.innerHTML = COPY_ICON; }, 1400);
-  }
-});
-
-/* ---------------- Barcode overlay ---------------- */
-let overlay = null;
-function openOverlay(code, who, art) {
-  closeOverlay();
-  overlay = document.createElement("div");
-  overlay.className = "overlay";
-  overlay.setAttribute("role", "dialog");
-  overlay.setAttribute("aria-label", "ID band barcode");
-  overlay.innerHTML = `<div class="big">${art || aztecSVG(code)}</div>
-    <div class="code num">${esc(code)}</div><div class="who">${esc(who)}</div>
-    <div class="close-hint">Click anywhere or press Esc to close</div>`;
-  overlay.addEventListener("click", closeOverlay);
-  document.body.appendChild(overlay);
-}
-function closeOverlay() { if (overlay) { overlay.remove(); overlay = null; } }
-document.addEventListener("click", e => {
-  const b = e.target.closest(".barcode"); if (b) openOverlay(b.dataset.code, b.dataset.who);
-  if (e.target.closest("[data-bloodbag]")) openOverlay(BLOOD_BAG.number, "Blood bag", `<img src="${BLOOD_BAG.src}" alt="">`);
-});
-
-/* ---------------- Search ---------------- */
-const q = $("#q"), results = $("#results");
-let hits = [], sel = 0;
-
-function search(term) {
-  const t = term.toUpperCase().replace(/\s+/g, "");
-  if (!t) return [];
-  const exact = INDEX.get(t);
-  if (exact) return exact;
-  const out = [];
-  for (const [k, arr] of INDEX) if (k.startsWith(t)) out.push(...arr);
-  if (out.length < 8) for (const [k, arr] of INDEX) if (!k.startsWith(t) && k.includes(t)) out.push(...arr);
-  return out.slice(0, 8);
-}
-
-function renderResults() {
-  const term = q.value.trim();
-  if (!term) { results.hidden = true; return; }
-  hits = search(term);
-  sel = 0;
-  const exactMulti = hits.length > 1 && hits.every(h => h.l.login.toUpperCase() === term.toUpperCase().replace(/\s+/g, ""));
-  results.hidden = false;
-  results.innerHTML = hits.length
-    ? (exactMulti ? `<div class="hint">${esc(hits[0].l.login)} is used in ${hits.length} courses. Pick yours:</div>` : "") +
-      hits.map((h, i) => `
-      <button class="result" type="button" role="option" data-i="${i}" data-group="${h.c.group}" aria-selected="${i === sel}">
-        <span class="dot"></span>
-        <span class="login num">${esc(h.l.login)}</span>
-        <span class="r-course">${esc(h.c.name)}${h.l.facility && h.c.facilities.length > 1 ? " · " + esc(h.l.facility) : ""}</span>
-        <span class="go">›</span>
-      </button>`).join("")
-    : `<div class="empty">No login matches “${esc(term)}”. Check with your trainer.</div>`;
-}
-
-function pick(i) {
-  const h = hits[i]; if (!h) return;
-  results.hidden = true; q.value = ""; q.blur();
-  go(`#/c/${h.c.id}/${encodeURIComponent(h.l.login)}`);
-}
-
-q.addEventListener("input", renderResults);
-q.addEventListener("focus", renderResults);
-q.addEventListener("keydown", e => {
-  if (results.hidden) return;
-  const opts = results.querySelectorAll(".result");
-  if (e.key === "ArrowDown" || e.key === "ArrowUp") {
-    e.preventDefault();
-    if (!opts.length) return;
-    sel = (sel + (e.key === "ArrowDown" ? 1 : -1) + opts.length) % opts.length;
-    opts.forEach((o, i) => o.setAttribute("aria-selected", i === sel));
-    opts[sel].scrollIntoView({ block: "nearest" });
-  } else if (e.key === "Enter") {
-    e.preventDefault(); pick(sel);
-  } else if (e.key === "Escape") {
-    results.hidden = true;
-  }
-});
-results.addEventListener("click", e => { const b = e.target.closest(".result"); if (b) pick(+b.dataset.i); });
-document.addEventListener("click", e => { if (!e.target.closest(".search")) results.hidden = true; });
-
-document.addEventListener("keydown", e => {
-  if (e.key === "Escape") {
-    if (dlg.open) return;
-    if (overlay) return closeOverlay();
-    if (!$("#card").hidden) return go("#/c/" + state.courseId);
-  }
-  if (e.key === "/" && document.activeElement !== q && !$("#browse").hidden) {
-    e.preventDefault(); q.focus();
-  }
-});
-
-$("#data-stamp").textContent = DATA.updated ? "Data updated " + DATA.updated : "";
-window.addEventListener("hashchange", route);
-route();
-</script>
+<script id="tc-data" type="application/json">__DATA_JSON__</script>
+<script>/*__LIB__*/</script>
+<script>/*__APP__*/</script>
 </body>
 </html>
