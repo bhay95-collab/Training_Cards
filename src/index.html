@@ -1,0 +1,811 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Training Card</title>
+<style>
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url(data:font/woff2;base64,__INTER_WOFF2__) format("woff2");
+}
+
+:root {
+  --bg: #f5f5f7;
+  --surface: #ffffff;
+  --text: #1d1d1f;
+  --text-2: #6e6e73;
+  --text-3: #86868b;
+  --line: #d2d2d7;
+  --navy: #0a2a4a;
+  --teal: #0a7480;
+  --teal-hover: #075c66;
+  --focus: #0a7480;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,.04), 0 2px 8px rgba(0,0,0,.04);
+  --shadow-md: 0 4px 12px rgba(0,0,0,.06), 0 12px 32px rgba(0,0,0,.08);
+  --radius-lg: 28px;
+  --radius-md: 18px;
+  --radius-sm: 12px;
+  --ease: cubic-bezier(.25,.1,.25,1);
+  --ease-out: cubic-bezier(.2,.8,.2,1);
+}
+
+[data-group="nursing"]   { --tile: #f5c6da; --soft: #fbe4ee; --ink: #8c1d4f; }
+[data-group="medical"]   { --tile: #bcd6ee; --soft: #e2eef9; --ink: #1e4f7c; }
+[data-group="midwifery"] { --tile: #cfc0ee; --soft: #ebe4f9; --ink: #4c2f8c; }
+[data-group="admin"]     { --tile: #a6d8b5; --soft: #dcf0e2; --ink: #1f5e38; }
+[data-group="pharmacy"]  { --tile: #fbe3a0; --soft: #fdf3d3; --ink: #765600; }
+[data-group="allied"]    { --tile: #f8d2ba; --soft: #fce9dd; --ink: #8d4018; }
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Inter", -apple-system, "Segoe UI", system-ui, sans-serif;
+  font-feature-settings: "cv11", "ss01";
+  font-size: 17px;
+  line-height: 1.47;
+  letter-spacing: -0.011em;
+  -webkit-font-smoothing: antialiased;
+}
+button { font: inherit; color: inherit; letter-spacing: inherit; }
+.num { font-variant-numeric: tabular-nums; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; border-radius: 8px; }
+[hidden] { display: none !important; }
+
+.wrap { max-width: 1240px; margin: 0 auto; padding: 0 40px; }
+
+/* ---------- Global nav ---------- */
+.nav {
+  position: sticky; top: 0; z-index: 20;
+  height: 48px;
+  background: rgba(245,245,247,.8);
+  backdrop-filter: saturate(180%) blur(20px);
+  border-bottom: 1px solid rgba(0,0,0,.06);
+}
+.nav .wrap { height: 100%; display: flex; align-items: center; justify-content: space-between; }
+.brand {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 15px; font-weight: 600; color: var(--text); text-decoration: none;
+  background: none; border: 0; padding: 4px 0; cursor: pointer;
+}
+.brand-mark {
+  width: 24px; height: 24px; border-radius: 7px;
+  background: linear-gradient(135deg, var(--navy), var(--teal));
+  display: grid; place-items: center;
+}
+.brand-mark svg { width: 14px; height: 14px; }
+.nav-note { font-size: 13px; color: var(--text-2); }
+
+/* ---------- Hero ---------- */
+.hero { padding: 72px 0 40px; display: flex; justify-content: space-between; align-items: flex-end; gap: 40px; flex-wrap: wrap; }
+.hero h1 {
+  margin: 0; color: var(--navy);
+  font-size: clamp(56px, 7.2vw, 96px); font-weight: 700;
+  letter-spacing: -0.035em; line-height: 1;
+}
+.hero-side { text-align: right; max-width: 420px; }
+.hero-side p.big { margin: 0; font-size: 28px; line-height: 1.15; font-weight: 600; color: var(--navy); letter-spacing: -0.02em; }
+.hero-side p.small { margin: 12px 0 0; font-size: 15px; color: var(--text-2); }
+
+/* ---------- Search ---------- */
+.search { position: relative; margin: 8px 0 64px; }
+.search-box {
+  display: flex; align-items: center; gap: 14px;
+  height: 64px; padding: 0 24px;
+  background: var(--surface); border-radius: 999px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid transparent;
+  transition: box-shadow .2s var(--ease), border-color .2s var(--ease);
+}
+.search-box:focus-within { border-color: var(--teal); box-shadow: 0 0 0 4px rgba(10,116,128,.15), var(--shadow-sm); }
+.search-box svg { flex: none; width: 22px; height: 22px; color: var(--text-3); }
+.search-box input {
+  flex: 1; border: 0; outline: 0; background: transparent;
+  font: inherit; font-size: 20px; font-weight: 500; letter-spacing: -0.01em; color: var(--text);
+  text-transform: uppercase;
+}
+.search-box input::placeholder { text-transform: none; color: var(--text-3); font-weight: 400; }
+.kbd { font-size: 12px; color: var(--text-3); border: 1px solid var(--line); border-radius: 6px; padding: 2px 7px; }
+.results {
+  position: absolute; left: 0; right: 0; top: 72px; z-index: 10;
+  background: var(--surface); border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md); padding: 8px; max-height: 420px; overflow: auto;
+  animation: pop .18s var(--ease-out);
+}
+.results .hint { padding: 10px 14px 6px; font-size: 13px; color: var(--text-2); }
+.result {
+  width: 100%; display: flex; align-items: center; gap: 14px;
+  padding: 12px 14px; border: 0; background: none; border-radius: var(--radius-sm);
+  text-align: left; cursor: pointer;
+}
+.result[aria-selected="true"], .result:hover { background: var(--bg); }
+.result .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--tile); box-shadow: inset 0 0 0 1px rgba(0,0,0,.08); flex: none; }
+.result .login { font-weight: 600; min-width: 140px; }
+.result .r-course { color: var(--text-2); }
+.result .go { margin-left: auto; color: var(--text-3); }
+.results .empty { padding: 18px 14px; color: var(--text-2); }
+
+/* ---------- Section headings ---------- */
+.section { padding-bottom: 72px; scroll-margin-top: 64px; }
+.h2 { margin: 0 0 28px; font-size: 32px; line-height: 1.12; font-weight: 700; letter-spacing: -0.025em; }
+.h2 span { color: var(--text-3); }
+
+/* ---------- Profession tiles ---------- */
+.professions { display: flex; gap: 12px; flex-wrap: wrap; }
+.prof {
+  display: flex; flex-direction: column; align-items: center; gap: 14px;
+  width: 148px; padding: 8px 4px 14px; border: 0; background: none; cursor: pointer;
+  border-radius: var(--radius-md);
+}
+.prof .icon {
+  width: 104px; height: 104px; border-radius: 28px;
+  background: var(--tile); color: var(--ink);
+  display: grid; place-items: center;
+  transition: transform .25s var(--ease-out), box-shadow .25s var(--ease-out);
+}
+.prof .icon svg { width: 48px; height: 48px; }
+.prof:hover .icon { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+.prof .label { font-size: 15px; font-weight: 500; position: relative; }
+.prof[aria-pressed="true"] .label { font-weight: 700; }
+.prof[aria-pressed="true"] .label::after {
+  content: ""; position: absolute; left: 50%; bottom: -10px; width: 6px; height: 6px; margin-left: -3px;
+  border-radius: 50%; background: var(--ink);
+}
+.prof[aria-pressed="true"] .icon { box-shadow: 0 0 0 3px var(--bg), 0 0 0 5px var(--ink); }
+
+/* ---------- Course cards ---------- */
+.courses { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+.course {
+  position: relative; overflow: hidden;
+  min-height: 280px; padding: 30px; border: 0; text-align: left; cursor: pointer;
+  background: var(--tile); border-radius: var(--radius-lg);
+  display: flex; flex-direction: column;
+  transition: transform .3s var(--ease-out), box-shadow .3s var(--ease-out);
+  animation: rise .4s var(--ease-out) both;
+}
+.course:hover { transform: translateY(-4px) scale(1.01); box-shadow: var(--shadow-md); }
+.course .eyebrow { font-size: 12px; font-weight: 600; letter-spacing: .02em; text-transform: uppercase; color: var(--ink); }
+.course .title { margin-top: 8px; font-size: 30px; line-height: 1.1; font-weight: 700; letter-spacing: -0.025em; }
+.course .meta { margin-top: 12px; font-size: 17px; color: rgba(29,29,31,.78); }
+.course .art { position: absolute; right: -18px; bottom: -22px; width: 150px; height: 150px; color: var(--ink); opacity: .16; }
+.course .cta { margin-top: auto; font-size: 15px; font-weight: 600; color: var(--ink); }
+.course[aria-pressed="true"] { box-shadow: 0 0 0 3px var(--bg), 0 0 0 6px var(--ink); }
+
+/* ---------- Logins ---------- */
+.chips { display: flex; gap: 8px; flex-wrap: wrap; margin: -8px 0 24px; }
+.chip {
+  height: 36px; padding: 0 18px; border-radius: 999px; cursor: pointer;
+  border: 1px solid var(--line); background: var(--surface); font-size: 15px; font-weight: 500;
+  transition: background .2s var(--ease), color .2s var(--ease), border-color .2s var(--ease);
+}
+.chip:hover { border-color: var(--text-3); }
+.chip[aria-pressed="true"] { background: var(--text); color: #fff; border-color: var(--text); }
+.logins { display: grid; grid-template-columns: repeat(auto-fill, minmax(156px, 1fr)); gap: 12px; }
+.login-tile {
+  height: 72px; padding: 0 18px; border: 0; cursor: pointer; text-align: left;
+  background: var(--surface); border-radius: var(--radius-md); box-shadow: var(--shadow-sm);
+  display: flex; flex-direction: column; justify-content: center;
+  transition: transform .2s var(--ease-out), box-shadow .2s var(--ease-out);
+  animation: rise .35s var(--ease-out) both;
+}
+.login-tile:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+.login-tile .l { font-size: 18px; font-weight: 600; letter-spacing: -0.01em; }
+.login-tile .f { font-size: 12px; color: var(--text-2); margin-top: 2px; }
+
+/* ---------- Card view ---------- */
+.back {
+  display: inline-flex; align-items: center; gap: 6px; margin: 28px 0 0;
+  border: 0; background: none; padding: 6px 0; cursor: pointer;
+  color: var(--teal); font-size: 17px;
+}
+.back:hover { color: var(--teal-hover); text-decoration: underline; }
+.card-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 32px; flex-wrap: wrap; padding: 28px 0 56px; }
+.card-head .eyebrow { font-size: 17px; font-weight: 600; color: var(--ink); margin-bottom: 6px; }
+.card-head h1 { margin: 0; font-size: clamp(56px, 7vw, 88px); line-height: 1; font-weight: 700; letter-spacing: -0.035em; }
+.creds {
+  background: var(--surface); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm);
+  padding: 10px 24px; min-width: 380px;
+}
+.creds .row { padding: 14px 0; }
+.creds .row + .row { border-top: 1px solid #ececf0; }
+
+.row { display: flex; align-items: center; gap: 12px; min-height: 28px; }
+.row .k { color: var(--text-2); font-size: 15px; flex: none; width: 112px; }
+.row .v { font-weight: 600; font-size: 17px; flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.row .v.muted { color: var(--text-3); font-weight: 400; }
+.copy {
+  flex: none; width: 32px; height: 32px; border-radius: 50%; border: 0; cursor: pointer;
+  background: transparent; color: var(--text-3); display: grid; place-items: center;
+  transition: background .15s var(--ease), color .15s var(--ease);
+}
+.copy:hover { background: rgba(0,0,0,.06); color: var(--text); }
+.copy svg { width: 17px; height: 17px; }
+.copy.done { color: #1f8a4c; }
+
+.patients { display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 20px; }
+.patients.compact { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+.patient {
+  background: var(--tile); border-radius: var(--radius-lg); padding: 30px;
+  display: flex; flex-direction: column; gap: 22px;
+  animation: rise .45s var(--ease-out) both;
+}
+.patient .eyebrow { font-size: 12px; font-weight: 600; letter-spacing: .02em; text-transform: uppercase; color: var(--ink); }
+.patient .name { margin-top: 6px; font-size: 28px; line-height: 1.1; font-weight: 700; letter-spacing: -0.025em; overflow-wrap: anywhere; }
+.patient .name small { display: block; font-size: 20px; font-weight: 500; letter-spacing: -0.015em; margin-top: 4px; color: rgba(29,29,31,.8); }
+.patient .body { display: flex; gap: 20px; align-items: stretch; }
+.details { flex: 1; min-width: 0; background: rgba(255,255,255,.62); border-radius: var(--radius-md); padding: 6px 16px; }
+.details .row { padding: 10px 0; }
+.details .row + .row { border-top: 1px solid rgba(0,0,0,.06); }
+.details .row .k { width: 96px; }
+.barcode {
+  flex: none; width: 172px; border: 0; cursor: zoom-in;
+  background: #fff; border-radius: var(--radius-md); padding: 16px 16px 12px;
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  transition: transform .2s var(--ease-out), box-shadow .2s var(--ease-out);
+}
+.barcode:hover { transform: scale(1.03); box-shadow: var(--shadow-md); }
+.barcode svg { width: 140px; height: 140px; display: block; }
+.barcode .cap { font-size: 12px; color: var(--text-2); text-align: center; line-height: 1.3; }
+.barcode .cap b { display: block; color: var(--text); font-weight: 600; font-size: 13px; }
+
+.sub { margin-top: 64px; }
+.others { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 20px; }
+.other { background: var(--surface); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); padding: 24px 28px 14px; animation: rise .5s var(--ease-out) both; }
+.other h3 { margin: 0; font-size: 21px; font-weight: 700; letter-spacing: -0.02em; }
+.other p { margin: 2px 0 8px; font-size: 15px; color: var(--text-2); }
+.other .row { padding: 10px 0; }
+.other .row + .row { border-top: 1px solid #ececf0; }
+
+.systems { display: grid; grid-template-columns: minmax(0, 2fr) minmax(320px, 1fr); gap: 28px; align-items: start; }
+.system-label { display: inline-flex; align-items: center; gap: 10px; margin: 0 0 18px; font-size: 21px; font-weight: 700; letter-spacing: -0.02em; }
+.system-label i { font-style: normal; font-size: 12px; font-weight: 600; color: var(--text-2); background: #e8e8ed; border-radius: 999px; padding: 3px 10px; letter-spacing: 0; }
+.hbcis { background: var(--surface); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); padding: 14px 24px; animation: rise .5s var(--ease-out) both; }
+.hbcis .row { padding: 11px 0; }
+.hbcis .row + .row { border-top: 1px solid #ececf0; }
+.hbcis .group-title { margin: 18px 0 2px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .02em; color: var(--text-2); }
+
+/* ---------- Footer ---------- */
+footer { border-top: 1px solid var(--line); padding: 20px 0 40px; color: var(--text-3); font-size: 12px; }
+footer .wrap { display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+
+/* ---------- Barcode overlay ---------- */
+.overlay {
+  position: fixed; inset: 0; z-index: 50; background: #fff;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 28px;
+  cursor: zoom-out; animation: fade .2s var(--ease) both;
+}
+.overlay .big svg { width: min(64vh, 80vw); height: min(64vh, 80vw); display: block; }
+.overlay .code { font-size: 32px; font-weight: 700; letter-spacing: .02em; }
+.overlay .who { font-size: 17px; color: var(--text-2); margin-top: -18px; }
+.overlay .close-hint { position: absolute; bottom: 28px; font-size: 13px; color: var(--text-3); }
+
+/* ---------- Toast ---------- */
+.toast {
+  position: fixed; left: 50%; bottom: 32px; z-index: 60; transform: translate(-50%, 16px);
+  background: rgba(29,29,31,.92); color: #fff; padding: 10px 18px; border-radius: 999px;
+  font-size: 15px; font-weight: 500; opacity: 0; pointer-events: none;
+  transition: opacity .2s var(--ease), transform .25s var(--ease-out);
+}
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+.empty-state { padding: 28px 30px; border-radius: var(--radius-lg); background: var(--surface); color: var(--text-2); box-shadow: var(--shadow-sm); }
+
+@keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@keyframes pop { from { opacity: 0; transform: translateY(-4px) scale(.99); } to { opacity: 1; transform: none; } }
+@keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+
+@media (max-width: 1100px) {
+  .systems { grid-template-columns: 1fr; }
+}
+@media (max-width: 720px) {
+  .wrap { padding: 0 16px; }
+  .hero { padding-top: 40px; }
+  .hero-side { text-align: left; }
+  .patients, .patients.compact { grid-template-columns: 1fr; }
+  .patient .body { flex-direction: column; }
+  .barcode { width: 100%; }
+  .creds { min-width: 0; width: 100%; }
+  .prof { width: 104px; }
+  .prof .icon { width: 80px; height: 80px; border-radius: 22px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  html { scroll-behavior: auto; }
+}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap">
+    <button class="brand" id="home" type="button" aria-label="Training Card home">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M7 10h5M7 14h3"/><circle cx="16" cy="12" r="2"/></svg>
+      </span>
+      Training Card
+    </button>
+    <span class="nav-note">Training data only · not real patients</span>
+  </div>
+</header>
+
+<main>
+  <!-- Browse view -->
+  <div id="browse">
+    <div class="wrap">
+      <section class="hero">
+        <h1>Training Card</h1>
+        <div class="hero-side">
+          <p class="big">Find your login.<br>Meet your patients.</p>
+          <p class="small">Your trainer gives you a login at the start of class.</p>
+        </div>
+      </section>
+
+      <div class="search">
+        <label class="search-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <input id="q" type="text" autocomplete="off" spellcheck="false"
+                 placeholder="Know your login? Type it here, e.g. MNRN01"
+                 aria-label="Search by login" aria-controls="results" aria-autocomplete="list">
+          <span class="kbd" aria-hidden="true">/</span>
+        </label>
+        <div class="results" id="results" role="listbox" hidden></div>
+      </div>
+
+      <section class="section" id="prof-section">
+        <h2 class="h2">Your profession. <span>Start here.</span></h2>
+        <div class="professions" id="professions"></div>
+      </section>
+
+      <section class="section" id="course-section" hidden>
+        <h2 class="h2" id="course-title"></h2>
+        <div class="courses" id="courses"></div>
+      </section>
+
+      <section class="section" id="login-section" hidden>
+        <h2 class="h2">Your login. <span>Your trainer gave you this.</span></h2>
+        <div class="chips" id="chips"></div>
+        <div class="logins" id="logins"></div>
+      </section>
+    </div>
+  </div>
+
+  <!-- Card view -->
+  <div id="card" hidden>
+    <div class="wrap" id="card-body"></div>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>Training environment data. Do not use for real patient care.</span>
+    <span id="data-stamp"></span>
+  </div>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>/*__AZTEC__*/</script>
+<script>
+const DATA = /*__DATA__*/;
+
+const GROUPS = [
+  { id: "nursing",   name: "Nursing",       icon: "heart" },
+  { id: "medical",   name: "Medical",       icon: "steth" },
+  { id: "midwifery", name: "Midwifery",     icon: "baby" },
+  { id: "admin",     name: "Admin",         icon: "clip" },
+  { id: "pharmacy",  name: "Pharmacy",      icon: "pill" },
+  { id: "allied",    name: "Allied Health", icon: "hand" },
+];
+
+const ICONS = {
+  heart: '<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z"/><path d="M7.5 11.5h2.5l1.2-2 1.8 4 1.2-2h2.3"/>',
+  steth: '<path d="M6 3v5a4 4 0 0 0 8 0V3"/><path d="M10 12v3a5 5 0 0 0 10 0v-2"/><circle cx="20" cy="11" r="2"/>',
+  baby:  '<circle cx="12" cy="7.5" r="3.5"/><path d="M5.5 21c0-4 2.9-7 6.5-7s6.5 3 6.5 7"/><path d="M10.5 7.5h.01M13.5 7.5h.01"/>',
+  clip:  '<rect x="5" y="4" width="14" height="17" rx="2.5"/><path d="M9 4V3h6v1"/><path d="M9 10h6M9 14h6M9 18h3"/>',
+  pill:  '<rect x="3.5" y="8.5" width="17" height="7" rx="3.5" transform="rotate(-35 12 12)"/><path d="m10 9 4.2 6"/>',
+  hand:  '<circle cx="12" cy="4.5" r="2"/><path d="M5 8.5h14M12 8.5V14m0 0-3.5 7M12 14l3.5 7"/>',
+};
+const icon = (name, sw = 1.7) =>
+  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[name]}</svg>`;
+const COPY_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2.5"/><path d="M16 8V6.5A2.5 2.5 0 0 0 13.5 4h-7A2.5 2.5 0 0 0 4 6.5v7A2.5 2.5 0 0 0 6.5 16H8"/></svg>';
+const TICK_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>';
+
+const $ = (s, el = document) => el.querySelector(s);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const groupOf = (id) => GROUPS.find(g => g.id === id);
+
+// Only courses that actually have logins are shown.
+const COURSES = DATA.courses.filter(c => c.logins.length);
+const courseById = Object.fromEntries(COURSES.map(c => [c.id, c]));
+
+// Which optional fields a course uses at all (so empty columns don't clutter cards).
+for (const c of COURSES) {
+  const has = (f) => c.logins.some(l => l.patients.some(p => p[f]));
+  c.has = { ward: has("ward"), dob: has("dob"), mrn: has("mrn") };
+  c.facilities = [...new Set(c.logins.map(l => l.facility).filter(Boolean))].sort();
+  c.logins.sort((a, b) => a.login.localeCompare(b.login, undefined, { numeric: true }));
+}
+
+// login -> [{course, login}]
+const INDEX = new Map();
+for (const c of COURSES) for (const l of c.logins) {
+  const k = l.login.toUpperCase();
+  if (!INDEX.has(k)) INDEX.set(k, []);
+  INDEX.get(k).push({ c, l });
+}
+
+/* ---------------- Routing ---------------- */
+// #/            home
+// #/g/<group>   profession chosen
+// #/c/<course>  course chosen, logins shown
+// #/c/<course>/<login>  the card
+const state = { facility: "" };
+
+function go(hash) { if (location.hash !== hash) location.hash = hash; else route(); }
+
+function route() {
+  const parts = location.hash.replace(/^#\/?/, "").split("/").filter(Boolean).map(decodeURIComponent);
+  closeOverlay();
+  if (parts[0] === "c" && courseById[parts[1]]) {
+    const c = courseById[parts[1]];
+    if (parts[2]) {
+      const l = c.logins.find(x => x.login.toUpperCase() === parts[2].toUpperCase());
+      if (l) return showCard(c, l);
+    }
+    return showBrowse(c.group, c);
+  }
+  if (parts[0] === "g" && groupOf(parts[1])) return showBrowse(parts[1], null);
+  showBrowse(null, null);
+}
+
+/* ---------------- Browse ---------------- */
+let lastScrollTarget = null;
+
+function showBrowse(groupId, course) {
+  $("#card").hidden = true;
+  $("#browse").hidden = false;
+  renderProfessions(groupId);
+
+  const cs = $("#course-section");
+  if (groupId) {
+    cs.hidden = false;
+    const g = groupOf(groupId);
+    $("#course-title").innerHTML = `${esc(g.name)} courses. <span>Pick the one you're in today.</span>`;
+    renderCourses(groupId, course);
+  } else {
+    cs.hidden = true;
+  }
+
+  const ls = $("#login-section");
+  if (course) {
+    if (state.courseId !== course.id) { state.facility = ""; state.courseId = course.id; }
+    ls.hidden = false;
+    renderLogins(course);
+  } else {
+    ls.hidden = true;
+  }
+
+  const target = course ? ls : groupId ? cs : null;
+  const key = course ? "c:" + course.id : groupId ? "g:" + groupId : "home";
+  if (target && lastScrollTarget !== key) requestAnimationFrame(() => target.scrollIntoView({ block: "start" }));
+  if (!target && lastScrollTarget && lastScrollTarget !== "home") window.scrollTo({ top: 0 });
+  lastScrollTarget = key;
+}
+
+function renderProfessions(active) {
+  const live = GROUPS.filter(g => COURSES.some(c => c.group === g.id));
+  $("#professions").innerHTML = live.map(g => `
+    <button class="prof" type="button" data-group="${g.id}" aria-pressed="${g.id === active}">
+      <span class="icon">${icon(g.icon)}</span>
+      <span class="label">${esc(g.name)}</span>
+    </button>`).join("");
+}
+
+function renderCourses(groupId, active) {
+  const list = COURSES.filter(c => c.group === groupId);
+  const g = groupOf(groupId);
+  $("#courses").innerHTML = list.map((c, i) => {
+    const bits = [`${c.logins.length} logins`];
+    if (c.facilities.length > 1) bits.push(`${c.facilities.length} facilities`);
+    if (c.logins.some(l => l.hbcis)) bits.push("ieMR + HBCIS");
+    if (c.barcode) bits.push("ID band barcodes");
+    return `
+    <button class="course" type="button" data-group="${c.group}" data-course="${c.id}"
+            aria-pressed="${active && active.id === c.id}" style="animation-delay:${i * 50}ms">
+      <span class="eyebrow">${esc(g.name)}</span>
+      <span class="title">${esc(c.name)}</span>
+      <span class="meta">${esc(bits.join(" · "))}</span>
+      <span class="cta">Choose login ›</span>
+      <span class="art">${icon(g.icon, 1.2)}</span>
+    </button>`;
+  }).join("");
+}
+
+function renderLogins(c) {
+  const chips = $("#chips");
+  if (c.facilities.length > 1) {
+    const all = ["", ...c.facilities];
+    chips.hidden = false;
+    chips.innerHTML = all.map(f =>
+      `<button class="chip" type="button" data-facility="${esc(f)}" aria-pressed="${state.facility === f}">${f ? esc(f) : "All"}</button>`
+    ).join("");
+  } else {
+    chips.hidden = true;
+    chips.innerHTML = "";
+  }
+  const list = c.logins.filter(l => !state.facility || l.facility === state.facility);
+  const showFac = c.facilities.length > 1 && !state.facility;
+  $("#logins").innerHTML = list.map((l, i) => `
+    <button class="login-tile num" type="button" data-login="${esc(l.login)}" style="animation-delay:${Math.min(i, 30) * 12}ms">
+      <span class="l">${esc(l.login)}</span>
+      ${showFac ? `<span class="f">${esc(l.facility)}</span>` : ""}
+    </button>`).join("");
+}
+
+$("#professions").addEventListener("click", e => {
+  const b = e.target.closest(".prof"); if (b) go("#/g/" + b.dataset.group);
+});
+$("#courses").addEventListener("click", e => {
+  const b = e.target.closest(".course"); if (b) go("#/c/" + b.dataset.course);
+});
+$("#chips").addEventListener("click", e => {
+  const b = e.target.closest(".chip"); if (!b) return;
+  state.facility = b.dataset.facility;
+  renderLogins(courseById[state.courseId]);
+});
+$("#logins").addEventListener("click", e => {
+  const b = e.target.closest(".login-tile"); if (b) go(`#/c/${state.courseId}/${encodeURIComponent(b.dataset.login)}`);
+});
+$("#home").addEventListener("click", () => go("#/"));
+
+/* ---------------- Card ---------------- */
+const DASH = '<span class="v muted">—</span>';
+
+function row(label, value, opts = {}) {
+  const v = value ? `<span class="v ${opts.num ? "num" : ""}">${esc(value)}</span>` : DASH;
+  const btn = value && opts.copy !== false
+    ? `<button class="copy" type="button" data-copy="${esc(value)}" aria-label="Copy ${esc(label)}">${COPY_ICON}</button>`
+    : "";
+  return `<div class="row"><span class="k">${esc(label)}</span>${v}${btn}</div>`;
+}
+
+function aztecSVG(text) {
+  try { return window.makeAztec(text); } catch (err) { return ""; }
+}
+
+function patientCard(c, p, i, compact) {
+  const code = c.barcode && p.fin ? "AC" + p.fin : "";
+  const svg = code ? aztecSVG(code) : "";
+  const fullName = [p.last, p.first].filter(Boolean).join(", ");
+  const rows = [
+    c.has.mrn ? row("MRN", p.mrn, { num: true }) : "",
+    row("Last name", p.last),
+    row("First name", p.first),
+    c.has.dob ? row("DOB", p.dob, { copy: false }) : "",
+    c.has.ward ? row("Ward", p.ward) : "",
+  ].join("");
+  return `
+  <article class="patient" style="animation-delay:${80 + i * 70}ms">
+    <div>
+      <div class="eyebrow">Patient ${i + 1} · ${esc(p.role)}</div>
+      <div class="name">${esc(p.last || "—")}${p.first ? `<small>${esc(p.first)}</small>` : ""}</div>
+    </div>
+    <div class="body">
+      <div class="details">${rows}</div>
+      ${svg ? `
+      <button class="barcode" type="button" data-code="${esc(code)}" data-who="${esc(fullName)}" aria-label="Enlarge ID band barcode for ${esc(fullName)}">
+        ${svg}
+        <span class="cap"><b class="num">${esc(code)}</b>Click to enlarge</span>
+      </button>` : ""}
+    </div>
+  </article>`;
+}
+
+function showCard(c, l) {
+  state.courseId = c.id;
+  const g = groupOf(c.group);
+  $("#browse").hidden = true;
+  const card = $("#card");
+  card.hidden = false;
+  card.dataset.group = c.group;
+
+  const compact = l.patients.length > 2 || !!l.hbcis;
+  const patients = l.patients.length
+    ? `<div class="patients ${compact ? "compact" : ""}">${l.patients.map((p, i) => patientCard(c, p, i, compact)).join("")}</div>`
+    : `<div class="empty-state">No patients set up for this login yet.</div>`;
+
+  const hb = l.hbcis;
+  const hbcis = hb ? `
+    <div>
+      <h3 class="system-label">HBCIS <i>Second system</i></h3>
+      <div class="hbcis">
+        <div class="group-title">Login</div>
+        ${row("Login", hb.login, { num: true })}
+        ${row("Password", hb.password)}
+        <div class="group-title">Patient</div>
+        ${row("URN", hb.urn, { num: true })}
+        ${row("Last name", hb.last)}
+        ${row("First name", hb.first)}
+        ${row("DOB", hb.dob, { copy: false })}
+        ${row("Doctor", hb.doctor)}
+        ${row("Unit", hb.unit)}
+        ${row("Admit ward", hb.ward)}
+        ${row("Transfer to", hb.transfer)}
+      </div>
+    </div>` : "";
+
+  const others = l.others && l.others.length ? `
+    <section class="sub">
+      <h2 class="h2">Other logins. <span>For checks and orders.</span></h2>
+      <div class="others">
+        ${l.others.map((o, i) => `
+          <div class="other" style="animation-delay:${200 + i * 60}ms">
+            <h3>${esc(o.label)}</h3><p>${esc(o.note)}</p>
+            ${row("Username", o.username)}
+            ${row("Password", o.password)}
+          </div>`).join("")}
+      </div>
+    </section>` : "";
+
+  $("#card-body").innerHTML = `
+    <button class="back" type="button" id="back">‹ ${esc(c.name)} logins</button>
+    <section class="card-head">
+      <div>
+        <div class="eyebrow">${esc(g.name)} · ${esc(c.name)}${l.facility && c.facilities.length > 1 ? " · " + esc(l.facility) : ""}</div>
+        <h1 class="num">${esc(l.login)}</h1>
+      </div>
+      <div class="creds">
+        ${row("Login", l.login, { num: true })}
+        ${row("Password", l.password)}
+      </div>
+    </section>
+
+    ${hb ? `
+    <div class="systems">
+      <div>
+        <h3 class="system-label">ieMR <i>Patients</i></h3>
+        ${patients}
+      </div>
+      ${hbcis}
+    </div>` : `
+    <section>
+      <h2 class="h2">Your patients. <span>Use these in ieMR today.</span></h2>
+      ${patients}
+    </section>`}
+
+    ${others}
+    <div style="height:72px"></div>`;
+
+  $("#back").addEventListener("click", () => go("#/c/" + c.id));
+  lastScrollTarget = "card";
+  window.scrollTo({ top: 0 });
+}
+
+/* ---------------- Copy ---------------- */
+const toast = $("#toast");
+let toastTimer;
+function showToast(msg) {
+  toast.textContent = msg;
+  toast.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove("show"), 1400);
+}
+async function copyText(text) {
+  try { await navigator.clipboard.writeText(text); return true; }
+  catch {
+    const ta = document.createElement("textarea");
+    ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.appendChild(ta); ta.select();
+    const ok = document.execCommand("copy"); ta.remove(); return ok;
+  }
+}
+document.addEventListener("click", async e => {
+  const b = e.target.closest(".copy"); if (!b) return;
+  if (await copyText(b.dataset.copy)) {
+    b.classList.add("done"); b.innerHTML = TICK_ICON;
+    showToast(`Copied ${b.dataset.copy}`);
+    setTimeout(() => { b.classList.remove("done"); b.innerHTML = COPY_ICON; }, 1400);
+  }
+});
+
+/* ---------------- Barcode overlay ---------------- */
+let overlay = null;
+function openOverlay(code, who) {
+  closeOverlay();
+  overlay = document.createElement("div");
+  overlay.className = "overlay";
+  overlay.setAttribute("role", "dialog");
+  overlay.setAttribute("aria-label", "ID band barcode");
+  overlay.innerHTML = `<div class="big">${aztecSVG(code)}</div>
+    <div class="code num">${esc(code)}</div><div class="who">${esc(who)}</div>
+    <div class="close-hint">Click anywhere or press Esc to close</div>`;
+  overlay.addEventListener("click", closeOverlay);
+  document.body.appendChild(overlay);
+}
+function closeOverlay() { if (overlay) { overlay.remove(); overlay = null; } }
+document.addEventListener("click", e => {
+  const b = e.target.closest(".barcode"); if (b) openOverlay(b.dataset.code, b.dataset.who);
+});
+
+/* ---------------- Search ---------------- */
+const q = $("#q"), results = $("#results");
+let hits = [], sel = 0;
+
+function search(term) {
+  const t = term.toUpperCase().replace(/\s+/g, "");
+  if (!t) return [];
+  const exact = INDEX.get(t);
+  if (exact) return exact;
+  const out = [];
+  for (const [k, arr] of INDEX) if (k.startsWith(t)) out.push(...arr);
+  if (out.length < 8) for (const [k, arr] of INDEX) if (!k.startsWith(t) && k.includes(t)) out.push(...arr);
+  return out.slice(0, 8);
+}
+
+function renderResults() {
+  const term = q.value.trim();
+  if (!term) { results.hidden = true; return; }
+  hits = search(term);
+  sel = 0;
+  const exactMulti = hits.length > 1 && hits.every(h => h.l.login.toUpperCase() === term.toUpperCase().replace(/\s+/g, ""));
+  results.hidden = false;
+  results.innerHTML = hits.length
+    ? (exactMulti ? `<div class="hint">${esc(hits[0].l.login)} is used in ${hits.length} courses. Pick yours:</div>` : "") +
+      hits.map((h, i) => `
+      <button class="result" type="button" role="option" data-i="${i}" data-group="${h.c.group}" aria-selected="${i === sel}">
+        <span class="dot"></span>
+        <span class="login num">${esc(h.l.login)}</span>
+        <span class="r-course">${esc(h.c.name)}${h.l.facility && h.c.facilities.length > 1 ? " · " + esc(h.l.facility) : ""}</span>
+        <span class="go">›</span>
+      </button>`).join("")
+    : `<div class="empty">No login matches “${esc(term)}”. Check with your trainer.</div>`;
+}
+
+function pick(i) {
+  const h = hits[i]; if (!h) return;
+  results.hidden = true; q.value = ""; q.blur();
+  go(`#/c/${h.c.id}/${encodeURIComponent(h.l.login)}`);
+}
+
+q.addEventListener("input", renderResults);
+q.addEventListener("focus", renderResults);
+q.addEventListener("keydown", e => {
+  if (results.hidden) return;
+  const opts = results.querySelectorAll(".result");
+  if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+    e.preventDefault();
+    if (!opts.length) return;
+    sel = (sel + (e.key === "ArrowDown" ? 1 : -1) + opts.length) % opts.length;
+    opts.forEach((o, i) => o.setAttribute("aria-selected", i === sel));
+    opts[sel].scrollIntoView({ block: "nearest" });
+  } else if (e.key === "Enter") {
+    e.preventDefault(); pick(sel);
+  } else if (e.key === "Escape") {
+    results.hidden = true;
+  }
+});
+results.addEventListener("click", e => { const b = e.target.closest(".result"); if (b) pick(+b.dataset.i); });
+document.addEventListener("click", e => { if (!e.target.closest(".search")) results.hidden = true; });
+
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape") {
+    if (overlay) return closeOverlay();
+    if (!$("#card").hidden) return go("#/c/" + state.courseId);
+  }
+  if (e.key === "/" && document.activeElement !== q && !$("#browse").hidden) {
+    e.preventDefault(); q.focus();
+  }
+});
+
+$("#data-stamp").textContent = DATA.updated ? "Data updated " + DATA.updated : "";
+window.addEventListener("hashchange", route);
+route();
+</script>
+</body>
+</html>
