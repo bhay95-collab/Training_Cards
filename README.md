@@ -12,8 +12,10 @@ No code needed. Open the Training Card, press **Ctrl + Alt + U**, and follow the
 
 `launchers/` holds two double-click launchers (keep the `Assets` folder next to them):
 
-- **Training Card - Full Screen.bat**: one Edge app window filling the screen.
-- **Training Card - Split Screen.bat**: two Edge app windows, left half and right half of the same screen.
+- **Training Card - Full Screen.bat**: one Edge app window filling the second screen.
+- **Training Card - Split Screen.bat**: two Edge app windows, left half and right half of the second screen.
+
+Both open on the second screen; on a PC with only one screen they use that screen.
 
 They find `TrainingCard.html` next to the launcher first, then on the user's Desktop. Running one again
 closes its old windows and opens fresh ones.

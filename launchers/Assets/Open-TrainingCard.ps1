@@ -1,8 +1,10 @@
 <#
   Opens the Training Card in Microsoft Edge as a clean app window (no address bar or tabs).
 
-    -Layout Single   one window filling the screen
-    -Layout Dual     two windows: left half and right half of the same screen
+    -Layout Single   one window filling the second screen
+    -Layout Dual     two windows: left half and right half of the second screen
+
+  Opens on the second screen. If the PC has only one screen, opens on that.
 
   Where it looks for TrainingCard.html (first one found wins):
     1. -CardPath, if given
@@ -122,7 +124,12 @@ function Open-Card($name) {
 }
 
 # ---------- Open ----------
-$area = [System.Windows.Forms.Screen]::PrimaryScreen.WorkingArea   # screen minus taskbar
+# Use the second screen (the first one that isn't the main screen, left to right).
+# If this PC only has one screen, use that.
+$screen = [System.Windows.Forms.Screen]::AllScreens |
+  Where-Object { -not $_.Primary } | Sort-Object { $_.Bounds.X } | Select-Object -First 1
+if (-not $screen) { $screen = [System.Windows.Forms.Screen]::PrimaryScreen }
+$area = $screen.WorkingArea   # that screen minus any taskbar
 
 if ($Layout -eq 'Single') {
   $win = Open-Card 'Full'
