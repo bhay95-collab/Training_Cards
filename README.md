@@ -8,6 +8,16 @@ Opened from the desktop of training PCs in Edge. Works offline. See `SPEC.md` fo
 No code needed. Open the Training Card, press **Ctrl + Alt + U**, and follow the 4 steps
 (download spreadsheet -> edit -> load -> save new file). The spreadsheet's **Read me** tab explains every column.
 
+## Opening the card on training PCs
+
+`launchers/` holds two double-click launchers (keep the `Assets` folder next to them):
+
+- **Training Card - Full Screen.bat**: one Edge app window filling the screen.
+- **Training Card - Split Screen.bat**: two Edge app windows, left half and right half of the same screen.
+
+They find `TrainingCard.html` next to the launcher first, then on the user's Desktop. Running one again
+closes its old windows and opens fresh ones.
+
 ## For developers
 
 Needs Node 18+ and Python 3 with openpyxl (only for the one-off conversion).
