@@ -214,8 +214,10 @@ function patientCard(c, p, i) {
     <div class="p-head">
       <div>
         <div class="eyebrow">Patient ${i + 1}${p.role ? " · " + esc(p.role) : ""}</div>
-        <div class="name"><span>${esc(p.last || "—")}</span>${p.last ? copyBtn("last name", p.last) : ""}</div>
-        ${p.first ? `<div class="first"><span>${esc(p.first)}</span>${copyBtn("first name", p.first)}</div>` : ""}
+        <div class="nm-label">Surname</div>
+        <div class="name"><span>${esc(p.last || "—")}</span>${p.last ? copyBtn("surname", p.last) : ""}</div>
+        ${p.first ? `<div class="nm-label">First name</div>
+        <div class="first"><span>${esc(p.first)}</span>${copyBtn("first name", p.first)}</div>` : ""}
       </div>
       ${svg ? `
       <button class="barcode" type="button" data-code="${esc(code)}" data-who="${esc(fullName)}" title="Click to enlarge" aria-label="Enlarge ID band barcode for ${esc(fullName)}">
@@ -273,7 +275,7 @@ function hbcisPanel(c, hb, solo) {
     ${login}
     <div class="group-title">Patient</div>
     ${r("urn", "URN", { num: true })}
-    ${r("last", "Last name")}${r("first", "First name")}${r("alias", "Alias")}
+    ${r("last", "Surname")}${r("first", "First name")}${r("alias", "Alias")}
     ${r("dob", "DOB", { copy: false })}
     ${r("doctor", "Doctor")}${r("unit", "Unit")}${r("ward", "Ward")}${r("transfer", "Transfer to")}
   </div>`;

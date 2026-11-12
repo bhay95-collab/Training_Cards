@@ -47,7 +47,9 @@ Replaces the Excel "Digital Training Card – Trainee Copy v2.0" with one web pa
 - **Course complete**: nav button + banner. "Has your trainer signed you off?" Yes -> opens ServiceNow access form (same link for all courses, overridable per course). No -> "Chat with your trainer".
 - **Pharmacy**: one card, Part A (pharmacist) and Part B (doctor login + patients) as sections. Searching the Part B login finds the card.
 - **MO ObGyn**: tabs "Instructor led" / "Proficiency", 3 patients each.
-- **MO Anaesthetist**: tabs "Training & Proficiency" / "Blank Record".
+- **MO Anaesthetist**: tabs "Training & Proficiency" / "Blank Record" (blank record case practice; role "Blank record practice").
+- **Patient names**: small "Surname" / "First name" labels, because training names look like logins (e.g. MNMOFN02).
+- **AO FirstNet ED HBCIS DOB**: fixed 01-Jan-2000 (confirmed).
 - **PEMR**: IOMS shown.
 - **AO HBCIS**: logins repeat per facility (TR20 at RBWH and TPCH); unique key = login + facility.
 - **Admin users**: a few non-technical people -> guided 4-step screen, plain-English problems, changes table, "Try it" before saving.
@@ -56,5 +58,3 @@ Replaces the Excel "Digital Training Card – Trainee Copy v2.0" with one web pa
 ## Open
 - How often data is updated (designed for occasional use).
 - Do training PCs reset on reboot? (affects any "remember this PC" feature — not in scope)
-- What the Anaesthetist "Blank Record" set is for (tab has no hint yet).
-- AO FirstNet ED HBCIS DOB is a fixed 01-Jan-2000, copied from the old card.

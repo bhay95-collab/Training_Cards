@@ -221,7 +221,8 @@ def main(src, out):
         pts = [patient(r, "Training & Proficiency", "Instructor led", **STD1),
                patient(r, "Training & Proficiency", "Proficiency", **STD2)]
         if b:
-            pts += [patient(b, "Blank Record", "", **STD1), patient(b, "Blank Record", "", **STD2)]
+            pts += [patient(b, "Blank Record", "Blank record practice", **STD1),
+                    patient(b, "Blank Record", "Blank record practice", **STD2)]
         anaes["logins"].append(login(lid, patients=pts))
     C.append(anaes)
 
