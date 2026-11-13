@@ -48,12 +48,14 @@ Replaces the Excel "Digital Training Card – Trainee Copy v2.0" with one web pa
 - **Pharmacy**: one card, Part A (pharmacist) and Part B (doctor login + patients) as sections. Searching the Part B login finds the card.
 - **MO ObGyn**: tabs "Instructor led" / "Proficiency", 3 patients each.
 - **MO Anaesthetist**: tabs "Training & Proficiency" / "Blank Record" (blank record case practice; role "Blank record practice").
+- **Patient cards**: role (Instructor led / Proficiency) as a solid badge in the profession ink; MRN, DOB and Ward in a white box (user's choice, kept over Hallmark's no-box-in-card rule).
+- **Course cards**: name and "Choose login" only (no login counts).
 - **Patient names**: small "Surname" / "First name" labels, because training names look like logins (e.g. MNMOFN02).
 - **AO FirstNet ED HBCIS DOB**: fixed 01-Jan-2000 (confirmed).
 - **PEMR**: IOMS shown.
 - **AO HBCIS**: logins repeat per facility (TR20 at RBWH and TPCH); unique key = login + facility.
 - **Admin users**: a few non-technical people -> guided 4-step screen, plain-English problems, changes table, "Try it" before saving.
-- **Admin shortcut**: Ctrl + Alt + U (Edge uses Ctrl + Shift + U for Read Aloud), or click "Data updated" in the footer 5 times.
+- **Admin shortcut**: Ctrl + Alt + U (Edge uses Ctrl + Shift + U for Read Aloud), or click the footer line 5 times. The "Data updated" footer was removed at the user's request (the date still shows on the admin screen).
 
 ## Open
 - How often data is updated (designed for occasional use).

@@ -240,7 +240,7 @@ const README = [
   ["This spreadsheet holds every course, login and patient shown on the Training Card. Edit it here, then load it into the Training Card's hidden Update screen to make a new Training Card file."],
   [""],
   ["How to update the Training Card"],
-  ["1. Open the Training Card and press Ctrl + Alt + U to open the Update screen (or click \"Data updated\" at the bottom of the page 5 times quickly)."],
+  ["1. Open the Training Card and press Ctrl + Alt + U to open the Update screen (or click the line at the very bottom of the page 5 times quickly)."],
   ["2. Click \"Download current data\" to get this spreadsheet with everything currently on the card."],
   ["3. Make your changes here and save (keep it as .xlsx)."],
   ["4. Back on the Update screen, load this file. Fix anything it lists as a Problem."],

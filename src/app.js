@@ -60,7 +60,6 @@ function setData(d) {
       if (l.second && l.second.login) add(l.second.login, l.second.label || "Second login");
     }
   }
-  $("#data-stamp").textContent = d.updated ? "Data updated " + d.updated : "";
 }
 
 /* ---------------- Routing ----------------
@@ -137,16 +136,10 @@ function renderProfessions(active) {
 function renderCourses(groupId, active) {
   const g = groupOf(groupId);
   $("#courses").innerHTML = COURSES.filter((c) => c.group === groupId).map((c, i) => {
-    const bits = [`${c.logins.length} login${c.logins.length === 1 ? "" : "s"}`];
-    if (c.facilities.length > 1) bits.push(`${c.facilities.length} facilities`);
-    if (c.logins.some((l) => l.hbcis && l.patients.length)) bits.push("ieMR + HBCIS");
-    else if (c.logins.some((l) => l.hbcis)) bits.push("HBCIS");
-    if (c.barcode) bits.push("ID band barcodes");
     return `
     <button class="course" type="button" data-group="${c.group}" data-course="${c.id}"
             aria-pressed="${!!active && active.id === c.id}" style="animation-delay:${i * 40}ms">
       <span class="title">${esc(c.name)}</span>
-      <span class="meta">${bits.map((b) => `<span>${esc(b)}</span>`).join("")}</span>
       <span class="cta">Choose login</span>
       <span class="art">${icon(g.icon, 1.2)}</span>
     </button>`;
@@ -212,7 +205,7 @@ function patientCard(c, p, i) {
   <article class="patient" style="animation-delay:${60 + i * 60}ms">
     <div class="p-head">
       <div>
-        <div class="p-tag"><b>Patient ${i + 1}</b>${p.role ? `<span>${esc(p.role)}</span>` : ""}</div>
+        <div class="p-tag">${p.role ? `<span class="role">${esc(p.role)}</span>` : ""}<span class="p-num">Patient ${i + 1}</span></div>
         <div class="nm-label">Surname</div>
         <div class="name"><span>${esc(p.last || "—")}</span>${p.last ? copyBtn("surname", p.last) : ""}</div>
         ${p.first ? `<div class="nm-label">First name</div>
@@ -664,7 +657,6 @@ function saveNew() {
 function tryIt() {
   if (!pending) return;
   setData(stamped(pending.data));
-  $("#data-stamp").textContent = "Trying new data";
   previewing = true;
   $("#preview-bar").hidden = false;
   lastScrollTarget = null;
@@ -683,9 +675,9 @@ $("#pv-save").addEventListener("click", saveNew);
 $("#pv-discard").addEventListener("click", endPreview);
 $("#admin-close").addEventListener("click", () => (previewing ? endPreview() : go("#/")));
 
-// Hidden ways in: Ctrl + Alt + U, or click "Data updated" in the footer 5 times quickly.
+// Hidden ways in: Ctrl + Alt + U, or click the footer line 5 times quickly.
 let taps = [];
-$("#data-stamp").addEventListener("click", () => {
+$("#footer-note").addEventListener("click", () => {
   const now = Date.now();
   taps = [...taps.filter((t) => now - t < 2500), now];
   if (taps.length >= 5) { taps = []; go("#/admin"); }

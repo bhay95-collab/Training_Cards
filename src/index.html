@@ -11,6 +11,7 @@
  * built: the project · redesign: polish · v2.0.0 */
 /* Hallmark · waive 38iii · grey second sentence on five section heads, the same pattern on every screen · the user named the Apple Store as the model for this Training Card and its two-tone section heads are the voice they asked for */
 /* Hallmark · waive 39b · six profession buttons at 162px on the home screen only · the profession tiles follow the Apple Store product row the user picked, so a trainee finds their profession at a glance */
+/* Hallmark · kept by request: the white details box inside each patient card (gate 4) · the user compared both versions and chose the box */
 /* Hallmark · waive 29 · one frosted bar, the sticky top nav only, dialog backdrop now a plain scrim · the frosted top nav follows the Apple Store bar the user asked this Training Card to feel like */
 
 @font-face {
@@ -54,7 +55,8 @@
   --on-tile: rgba(29,29,31,.8);
   --on-tile-2: rgba(29,29,31,.72);
   --on-tile-icon: rgba(29,29,31,.64);
-  --on-tile-line: rgba(0,0,0,.1);
+  --on-tile-line: rgba(0,0,0,.08);
+  --on-tile-panel: rgba(255,255,255,.62);
 
   /* States */
   --success: #1f8a4c;
@@ -224,7 +226,7 @@ button { font: inherit; color: inherit; letter-spacing: inherit; }
 .courses { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
 .course {
   position: relative; overflow: hidden;
-  min-height: 196px; padding: 24px; border: 0; text-align: left; cursor: pointer;
+  min-height: 148px; padding: 24px; border: 0; text-align: left; cursor: pointer;
   background: var(--tile); border-radius: var(--radius-lg);
   display: flex; flex-direction: column;
   transition: transform .3s var(--ease-out), box-shadow .3s var(--ease-out);
@@ -233,8 +235,6 @@ button { font: inherit; color: inherit; letter-spacing: inherit; }
 .course:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
 .course:active { transform: scale(.98); }
 .course .title { font-size: 26px; line-height: 1.1; font-weight: 700; letter-spacing: -0.025em; overflow-wrap: break-word; min-width: 0; padding-right: 24px; }
-.course .meta { margin-top: 12px; font-size: 15px; line-height: 1.4; color: var(--on-tile); }
-.course .meta span { display: block; }
 .course .art { position: absolute; right: -16px; bottom: -20px; width: 100px; height: 100px; color: var(--ink); opacity: .16; }
 .course .cta { margin-top: auto; padding-top: 16px; font-size: 15px; font-weight: 600; color: var(--ink); }
 .course[aria-pressed="true"] { box-shadow: 0 0 0 3px var(--bg), 0 0 0 6px var(--ink); }
@@ -320,9 +320,10 @@ button { font: inherit; color: inherit; letter-spacing: inherit; }
 }
 .p-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
 .p-head > div { min-width: 0; }
-.p-tag { display: flex; flex-wrap: wrap; gap: 0 8px; font-size: 13px; line-height: 1.35; color: var(--ink); }
-.p-tag b { font-weight: 700; }
-.patient .nm-label { margin-top: 8px; font-size: 12px; line-height: 1.3; color: var(--on-tile-2); }
+.p-tag { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 8px; font-size: 13px; line-height: 1.35; }
+.p-tag .role { background: var(--ink); color: var(--on-dark); font-size: 15px; font-weight: 700; padding: 4px 12px; border-radius: 999px; letter-spacing: -0.01em; }
+.p-tag .p-num { color: var(--on-tile-2); font-weight: 600; }
+.patient .nm-label { margin-top: 12px; font-size: 12px; line-height: 1.3; color: var(--on-tile-2); }
 .patient .name, .patient .first { display: flex; align-items: center; gap: 4px; }
 .patient .name { font-size: 22px; line-height: 1.15; font-weight: 700; letter-spacing: -0.02em; }
 .patient .first { font-size: 16px; font-weight: 400; letter-spacing: -0.01em; color: var(--on-tile); }
@@ -330,8 +331,8 @@ button { font: inherit; color: inherit; letter-spacing: inherit; }
 .patient .name .copy, .patient .first .copy { width: 28px; height: 28px; color: var(--on-tile-icon); }
 .patient .row .k { color: var(--on-tile-2); }
 .patient .copy { color: var(--on-tile-icon); }
-/* Details sit straight on the tile, divided by hairlines: one surface, no box inside the card. */
-.details { border-top: 1px solid var(--on-tile-line); }
+/* The user asked to keep the white details box: it separates the numbers trainees type from the names above. */
+.details { background: var(--on-tile-panel); border-radius: 14px; padding: 4px 8px 4px 16px; }
 .details .row { padding: 4px 0; }
 .details .row + .row { border-top: 1px solid var(--on-tile-line); }
 
@@ -495,7 +496,7 @@ details.more .issues { margin-top: 8px; }
 
 /* ---------- Footer ---------- */
 footer { border-top: 1px solid var(--line); padding: 20px 0 40px; color: var(--text-2); font-size: 13px; }
-footer .wrap { display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+footer .wrap { display: flex; gap: 20px; flex-wrap: wrap; }
 
 /* ---------- Barcode overlay ---------- */
 .overlay {
@@ -677,8 +678,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 20px; flex-wr
 
 <footer>
   <div class="wrap">
-    <span>Training environment data. Do not use for real patient care.</span>
-    <span id="data-stamp"></span>
+    <span id="footer-note">Training environment data. Do not use for real patient care.</span>
   </div>
 </footer>
 
