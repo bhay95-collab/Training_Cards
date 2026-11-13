@@ -26,11 +26,19 @@ const store = {
   get(k, s = localStorage) { try { return s.getItem(k); } catch { return null; } },
   set(k, v, s = localStorage) { try { v == null ? s.removeItem(k) : s.setItem(k, v); } catch {} },
 };
+// One PC can run several trainee screens (e.g. a dual-screen PC). Each window opened with
+// ?seat=N (the Live launchers do this) is its own trainee with its own login.
+const SEAT = (() => {
+  const n = parseInt(new URLSearchParams(location.search).get("seat") || "", 10);
+  return n >= 1 && n <= 9 ? n : 0;
+})();
 function deviceId() {
-  let d = store.get("tc-device");
-  if (!d) { d = crypto.randomUUID(); store.set("tc-device", d); }
+  const key = SEAT ? `tc-device-seat${SEAT}` : "tc-device";
+  let d = store.get(key);
+  if (!d) { d = crypto.randomUUID(); store.set(key, d); }
   return d;
 }
+const seatLabel = SEAT ? `Screen ${SEAT}` : "";
 const staff = {
   get token() { return store.get("tc-staff", sessionStorage); },
   get role() { return store.get("tc-role", sessionStorage); },
@@ -143,7 +151,7 @@ async function showHome() {
       <h1>Training Card</h1>
       <div class="hero-side">
         <p class="big">Join your class.<br>Get your login.</p>
-        <p class="small">Your instructor shows a class code at the front of the room.</p>
+        <p class="small">Your instructor shows a class code at the front of the room.${seatLabel ? ` This is ${esc(seatLabel.toLowerCase())} on this PC.` : ""}</p>
       </div>
     </section>
     <section class="join">
@@ -290,7 +298,7 @@ async function showCard() {
       </section>
       <div class="stage ${changed ? "changed" : ""}" role="status" aria-live="polite">
         <span class="stage-label">Now showing</span>${stageText(card.class)}
-        <span class="live-state">Class ${esc(card.class.code)}${card.class.site ? ", " + esc(card.class.site) : ""}</span>
+        <span class="live-state">${seatLabel ? `<b>${esc(seatLabel)}</b>. ` : ""}Class ${esc(card.class.code)}${card.class.site ? ", " + esc(card.class.site) : ""}</span>
       </div>
       ${patientsBlock(card)}
       ${othersBlock(card)}

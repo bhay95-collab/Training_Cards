@@ -18,7 +18,8 @@
 #>
 param(
   [ValidateSet('Single', 'Dual')][string]$Layout = 'Single',
-  [string]$CardPath = ''
+  [string]$CardPath = '',
+  [string]$Url = ''        # the live site; when set, opens it instead of the local file
 )
 $ErrorActionPreference = 'Stop'
 
@@ -45,6 +46,7 @@ function Fail($message) {
 }
 
 # ---------- Find the card ----------
+$live = [bool]$Url
 $batFolder = Split-Path -Parent $PSScriptRoot
 $desktop = [Environment]::GetFolderPath('Desktop')
 $card = @($CardPath,
@@ -52,10 +54,13 @@ $card = @($CardPath,
           (Join-Path $PSScriptRoot 'TrainingCard.html'),
           (Join-Path $desktop 'TrainingCard.html')) |
   Where-Object { $_ -and (Test-Path -LiteralPath $_) } | Select-Object -First 1
-if (-not $card) {
+if ($live) {
+  $url = $Url
+} elseif (-not $card) {
   Fail "Can't find TrainingCard.html.`n`nPut it on the Desktop, or in the same folder as this launcher."
+} else {
+  $url = ([System.Uri](Resolve-Path -LiteralPath $card).Path).AbsoluteUri
 }
-$url = ([System.Uri](Resolve-Path -LiteralPath $card).Path).AbsoluteUri
 
 # ---------- Find Edge ----------
 $edge = @("${env:ProgramFiles(x86)}\Microsoft\Edge\Application\msedge.exe",
@@ -107,13 +112,16 @@ function Set-WindowBox($hwnd, [int]$x, [int]$y, [int]$w, [int]$h) {
   }
 }
 
-function Open-Card($name) {
-  $dir = Join-Path $env:LOCALAPPDATA "TrainingCard\Edge-$name"
+function Open-Card($name, [int]$seat = 1) {
+  # Live windows each get their own profile AND seat number, so every screen is its own trainee.
+  $profileName = if ($live) { "Live-$name" } else { $name }
+  $target = if ($live) { $url.Split('#')[0].TrimEnd('?') + "?seat=$seat" } else { $url }
+  $dir = Join-Path $env:LOCALAPPDATA "TrainingCard\Edge-$profileName"
   Close-Profile $dir
   New-Item -ItemType Directory -Force -Path $dir | Out-Null
   $arguments = @(
     "--user-data-dir=`"$dir`"",
-    "--app=`"$url`"",
+    "--app=`"$target`"",
     '--no-first-run',
     '--no-default-browser-check'
   )
@@ -139,9 +147,9 @@ if ($Layout -eq 'Single') {
 }
 else {
   $half = [math]::Floor($area.Width / 2)
-  $left = Open-Card 'Left'
+  $left = Open-Card 'Left' 1
   Set-WindowBox $left $area.X $area.Y $half $area.Height
-  $right = Open-Card 'Right'
+  $right = Open-Card 'Right' 2
   Set-WindowBox $right ($area.X + $half) $area.Y ($area.Width - $half) $area.Height
   [TCWin]::SetForegroundWindow($left) | Out-Null
 }
