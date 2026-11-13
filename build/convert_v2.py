@@ -61,9 +61,13 @@ def get(row, letter):
     return row[i] if i < len(row) else None
 
 
-def patient(row, group="", role="", last=None, first=None, dob=None, mrn=None, ward=None, fin=None, ioms=None):
+I, P = "instructor", "proficiency"   # the two modes the instructor toggles between
+
+
+def patient(row, part="", mode=I, role="", last=None, first=None, dob=None, mrn=None, ward=None, fin=None, ioms=None):
     return {
-        "group": group,
+        "part": part,
+        "mode": mode,
         "role": role,
         "last": text(get(row, last)) if last else "",
         "first": text(get(row, first)) if first else "",
@@ -98,8 +102,7 @@ PASSWORD = DEFAULTS["password"]
 WITNESS = DEFAULTS["witness"]
 
 
-def course(tab, name, group, *, barcode=False, blood=None, layout="all", witness=True,
-           doctor="", access=True):
+def course(tab, name, group, *, barcode=False, blood=None, witness=True, doctor=""):
     return {
         "tab": tab,
         "name": name,
@@ -107,7 +110,6 @@ def course(tab, name, group, *, barcode=False, blood=None, layout="all", witness
         "show": True,
         "barcode": barcode,
         "bloodBag": (group != "admin") if blood is None else blood,
-        "layout": layout,
         "witness": dict(WITNESS) if witness else None,
         "doctor": {"username": doctor, "password": PASSWORD} if doctor else None,
         "accessUrl": "",
@@ -141,7 +143,7 @@ STD1 = dict(last="C", first="D", dob="E", ward="F", mrn="G", fin="H")
 STD2 = dict(last="L", first="M", dob="N", ward="O", mrn="P", fin="Q")
 
 
-def standard(wb, sheet, c, roles=("Instructor led", "Proficiency"), fallback_doctor="", extra1=None, extra2=None):
+def standard(wb, sheet, c, roles=("", ""), modes=(I, P), fallback_doctor="", extra1=None, extra2=None, more=None):
     rs = rows(wb, sheet)
     default_doc = course_doctor(rs, "T", fallback_doctor)
     if default_doc:
@@ -152,20 +154,18 @@ def standard(wb, sheet, c, roles=("Instructor led", "Proficiency"), fallback_doc
             text(get(r, "B")),
             doctor=doc if doc and doc != default_doc else "",
             patients=[
-                patient(r, role=roles[0], **STD1, **(extra1 or {})),
-                patient(r, role=roles[1], **STD2, **(extra2 or {})),
+                patient(r, mode=modes[0], role=roles[0], **STD1, **(extra1 or {})),
+                patient(r, mode=modes[1], role=roles[1], **STD2, **(extra2 or {})),
+                *(more(r) if more else []),
             ]))
     return c
 
 
-def ao(wb, sheet, c, roles, hbcis_dob_col=None, hbcis_dob_fixed="", hbcis_extra=True):
+def ao(wb, sheet, c, roles, modes, parts=("", "", "", ""), hbcis_dob_col=None, hbcis_dob_fixed="", hbcis_extra=True):
+    cols = [("E", "F", "G", "D"), ("I", "J", "K", "H"), ("M", "N", "O", "L"), ("Q", "R", "S", "P")]
     for r in rows(wb, sheet):
-        pts = [
-            patient(r, role=roles[0], last="E", first="F", dob="G", mrn="D"),
-            patient(r, role=roles[1], last="I", first="J", dob="K", mrn="H"),
-            patient(r, role=roles[2], last="M", first="N", dob="O", mrn="L"),
-            patient(r, role=roles[3], last="Q", first="R", dob="S", mrn="P"),
-        ]
+        pts = [patient(r, part=parts[i], mode=modes[i], role=roles[i], last=a, first=b, dob=d, mrn=m)
+               for i, (a, b, d, m) in enumerate(cols)]
         hb = {
             "login": text(get(r, "T")), "password": text(get(r, "U")), "urn": number(get(r, "V")),
             "last": text(get(r, "W")), "first": text(get(r, "X")), "alias": "",
@@ -205,9 +205,13 @@ def main(src, out):
 
     # ---------------- Midwifery ----------------
     C.append(standard(wb, "2026 MIDWIFERY DAY 1 Trg & Prof", course("Midwifery Day 1", "Midwifery Day 1", "midwifery", barcode=True),
-                      roles=("Antenatal (training)", "Postnatal (training)"), fallback_doctor="OB, Olly"))
+                      roles=("Antenatal", "Postnatal"), modes=(I, I), fallback_doctor="OB, Olly",
+                      more=lambda r: [
+                          patient(r, mode=P, role="Antenatal", last="W", first="X", dob="Y", ward="Z", mrn="AA", fin="AB"),
+                          patient(r, mode=P, role="Postnatal", last="AF", first="AG", dob="AH", ward="AI", mrn="AJ", fin="AK"),
+                      ]))
     C.append(standard(wb, "2026 MIDWIFERY DAY 2 Trg & Prof", course("Midwifery Day 2", "Midwifery Day 2: Birth Suite", "midwifery", barcode=True),
-                      roles=("Training", "Proficiency"), fallback_doctor="OB, Olly"))
+                      fallback_doctor="OB, Olly"))
     C.append(course("Neonate", "Neonate", "midwifery", barcode=True, doctor="OB, Olly"))
 
     # ---------------- Medical ----------------
@@ -219,50 +223,49 @@ def main(src, out):
     C.append(course("MO Renal OPD", "MO Renal OPD", "medical", doctor="MED, Molly"))
 
     # Anaesthetist: same login in two old tabs -> two card tabs.
-    anaes = course("MO Anaesthetist SAA", "MO Anaesthetist (SAA)", "medical", layout="tabs", doctor="SURG, Sally")
+    anaes = course("MO Anaesthetist SAA", "MO Anaesthetist (SAA)", "medical", doctor="SURG, Sally")
     blank = {text(get(r, "B")): r for r in rows(wb, "2026 MO ANAES SAA Blank Record")}
     for r in rows(wb, "2026 MO ANAES SAA Trg & Prof"):
         lid = text(get(r, "B"))
         b = blank.get(lid)
-        pts = [patient(r, "Training & Proficiency", "Instructor led", **STD1),
-               patient(r, "Training & Proficiency", "Proficiency", **STD2)]
+        pts = [patient(r, "Training", I, **STD1), patient(r, "Training", P, **STD2)]
         if b:
-            pts += [patient(b, "Blank Record", "Blank record practice", **STD1),
-                    patient(b, "Blank Record", "Blank record practice", **STD2)]
+            pts += [patient(b, "Blank Record", I, "Blank record practice", **STD1),
+                    patient(b, "Blank Record", P, "Blank record practice", **STD2)]
         anaes["logins"].append(login(lid, patients=pts))
     C.append(anaes)
 
     C.append(standard(wb, "2026 MO SURGEON", course("MO Surgeon", "MO Surgeon", "medical"), fallback_doctor="SURG, Sally"))
 
     # ObGyn: 3 instructor-led + 3 proficiency patients -> two card tabs.
-    obgyn = course("MO ObGyn", "MO Obstetrics & Gynaecology", "medical", layout="tabs", witness=False)
+    obgyn = course("MO ObGyn", "MO Obstetrics & Gynaecology", "medical", witness=False)
     og = rows(wb, "2026 MO Obgyn Trg & Prof")
     obgyn["doctor"] = {"username": course_doctor(og, "AL", "OB, Olly"), "password": PASSWORD}
     for r in og:
         obgyn["logins"].append(login(text(get(r, "B")), patients=[
-            patient(r, "Instructor led", "Obs/Gyn", last="C", first="D", dob="E", mrn="F", ward="G"),
-            patient(r, "Instructor led", "Birth Suite", last="I", first="J", dob="K", mrn="L", ward="M"),
-            patient(r, "Instructor led", "Postnatal", last="O", first="P", dob="Q", mrn="R", ward="S"),
-            patient(r, "Proficiency", "Obs/Gyn", last="U", first="V", dob="W", mrn="X", ward="Y"),
-            patient(r, "Proficiency", "Birth Suite", last="AA", first="AB", dob="AC", mrn="AD", ward="AE"),
-            patient(r, "Proficiency", "Postnatal", last="AG", first="AH", dob="AI", mrn="AJ", ward="AK"),
+            patient(r, "", I, "Obs/Gyn", last="C", first="D", dob="E", mrn="F", ward="G"),
+            patient(r, "", I, "Birth Suite", last="I", first="J", dob="K", mrn="L", ward="M"),
+            patient(r, "", I, "Postnatal", last="O", first="P", dob="Q", mrn="R", ward="S"),
+            patient(r, "", P, "Obs/Gyn", last="U", first="V", dob="W", mrn="X", ward="Y"),
+            patient(r, "", P, "Birth Suite", last="AA", first="AB", dob="AC", mrn="AD", ward="AE"),
+            patient(r, "", P, "Postnatal", last="AG", first="AH", dob="AI", mrn="AJ", ward="AK"),
         ]))
     C.append(obgyn)
     C.append(course("MO Obst Postnatal Day 2", "MO Obstetrics Postnatal Day 2", "medical", witness=False, doctor="OB, Olly"))
     C.append(standard(wb, "2026 MO RADIOLOGY", course("MO Radiology", "MO Radiology", "medical"), fallback_doctor="RAD, Randy"))
 
     # ---------------- Pharmacy: Part A (pharmacist) + Part B (doctor) on one card ----------------
-    ph = course("Pharmacy", "Pharmacy", "pharmacy", layout="sections", doctor="MED, Molly")
+    ph = course("Pharmacy", "Pharmacy", "pharmacy", doctor="MED, Molly")
     for r in rows(wb, "2026 PHARMACY PART A"):
         part_b = text(get(r, "W"))
         ph["logins"].append(login(
             text(get(r, "B")),
-            second={"label": "Doctor login", "login": part_b, "password": PASSWORD, "group": "Part B: Doctor"} if part_b else None,
+            second={"label": "Doctor login", "login": part_b, "password": PASSWORD, "part": "Part B: Doctor"} if part_b else None,
             patients=[
-                patient(r, "Part A: Pharmacist", "Instructor led", **STD1),
-                patient(r, "Part A: Pharmacist", "Proficiency", **STD2),
-                patient(r, "Part B: Doctor", "Instructor led", last="X", first="Y", dob="Z", mrn="AA", ward="AB"),
-                patient(r, "Part B: Doctor", "Proficiency", last="AD", first="AE", dob="AF", mrn="AG", ward="AH"),
+                patient(r, "Part A: Pharmacist", I, **STD1),
+                patient(r, "Part A: Pharmacist", P, **STD2),
+                patient(r, "Part B: Doctor", I, last="X", first="Y", dob="Z", mrn="AA", ward="AB"),
+                patient(r, "Part B: Doctor", P, last="AD", first="AE", dob="AF", mrn="AG", ward="AH"),
             ]))
     C.append(ph)
 
@@ -271,13 +274,13 @@ def main(src, out):
 
     # ---------------- Admin ----------------
     C.append(ao(wb, "2026 AO FirstNet ED", course("AO FirstNet ED", "AO FirstNet ED", "admin", witness=False),
-                ["Instructor led", "Short Term Treatment Area", "Ward", "Proficiency"], hbcis_dob_fixed="01-Jan-2000"))
+                ["", "Short Term Treatment Area", "Ward", ""], [I, I, I, P], hbcis_dob_fixed="01-Jan-2000"))
     C.append(ao(wb, "2026 AO FN VECS TRIAGE & DEPART", course("AO FirstNet VECS", "AO FirstNet VECS: Triage & Departure", "admin", witness=False),
-                ["Triage, instructor led", "Triage, proficiency", "Departure, instructor led", "Departure, proficiency"]))
+                ["", "", "", ""], [I, P, I, P], parts=("Triage", "Triage", "Departure", "Departure")))
     C.append(ao(wb, "2026 AO ESM", course("AO ESM", "AO ESM", "admin", witness=False),
-                ["Instructor led", "", "", ""]))
+                ["", "", "", ""], [I, I, I, P]))
     C.append(ao(wb, "2026 AO Surgical Bookings", course("AO Surgical Bookings", "AO Surgical Bookings", "admin", witness=False),
-                ["Instructor led", "Proficiency", "", ""], hbcis_dob_col="Y"))
+                ["", "", "", ""], [I, P, I, P], hbcis_dob_col="Y"))
 
     # HBCIS only: the login IS the HBCIS login; one HBCIS patient.
     hb_only = course("AO HBCIS", "AO HBCIS", "admin", witness=False)

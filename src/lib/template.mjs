@@ -1,3 +1,4 @@
+import { colName } from "./xlsx.mjs";
 // The Training Card Excel template: column names, reading it into site data
 // (with plain-English checks), and writing site data back out as a template.
 
@@ -5,13 +6,14 @@ export const PROFESSIONS = [
   ["nursing", "Nursing"], ["medical", "Medical"], ["midwifery", "Midwifery"],
   ["admin", "Admin"], ["pharmacy", "Pharmacy"], ["allied", "Allied Health"],
 ];
-export const LAYOUTS = [["all", "All together"], ["tabs", "Tabs"], ["sections", "Sections"]];
+// What the instructor toggles: every patient belongs to a mode, and optionally a part (e.g. Pharmacy Part A).
+export const MODES = [["instructor", "Instructor led"], ["proficiency", "Proficiency"], ["always", "Always"]];
 export const MAX_PATIENTS = 6;
 const YES_NO = ["Yes", "No"];
 
 const COURSE_COLS = {
   tab: "Tab name", name: "Course name", group: "Profession", show: "Show on site",
-  barcode: "Patient barcodes", bloodBag: "Blood bag barcode", layout: "Patient layout",
+  barcode: "Patient barcodes", bloodBag: "Blood bag barcode",
   doctorUser: "Doctor username", doctorPass: "Doctor password",
   witnessUser: "Witness username", witnessPass: "Witness password",
   accessUrl: "Access request link", notes: "Notes",
@@ -19,10 +21,10 @@ const COURSE_COLS = {
 const LOGIN_COLS = {
   login: "Login", password: "Password", facility: "Facility", doctor: "Doctor username (only if different)",
   secondLabel: "Second login label", second: "Second login", secondPass: "Second login password",
-  secondGroup: "Second login tab / section",
+  secondPart: "Second login part",
 };
 const PT_FIELDS = {
-  group: "Tab / section", role: "Role", last: "Last name", first: "First name", dob: "DOB",
+  part: "Part", mode: "Mode", role: "Label", last: "Last name", first: "First name", dob: "DOB",
   mrn: "MRN", fin: "FIN", ward: "Ward", ioms: "IOMS",
 };
 const HBCIS_COLS = {
@@ -127,9 +129,6 @@ export function fromWorkbook(sheets) {
     const profText = cell(row, ci.group, where, "Profession");
     const prof = PROFESSIONS.find(([id, label]) => norm(label) === norm(profText) || id === norm(profText));
     if (!prof) return add("error", where, `Profession "${profText || "(blank)"}" isn't one of: ${PROFESSIONS.map((p) => p[1]).join(", ")}.`);
-    const layoutText = cell(row, ci.layout, where, "Patient layout");
-    const layout = LAYOUTS.find(([id, label]) => norm(label) === norm(layoutText) || id === norm(layoutText));
-    if (layoutText && !layout) add("warning", where, `Patient layout "${layoutText}" isn't one of: ${LAYOUTS.map((l) => l[1]).join(", ")}. Using "All together".`);
     const id = slug(tab);
     if (seenIds.has(id)) return add("error", where, `The tab name "${tab}" is too similar to another course's tab name. Make it more different.`);
     seenIds.add(id);
@@ -141,7 +140,6 @@ export function fromWorkbook(sheets) {
       show: yesNo(cell(row, ci.show, where, "Show on site"), where, "Show on site", true),
       barcode: yesNo(cell(row, ci.barcode, where, "Patient barcodes"), where, "Patient barcodes", false),
       bloodBag: yesNo(cell(row, ci.bloodBag, where, "Blood bag barcode"), where, "Blood bag barcode", false),
-      layout: layout ? layout[0] : "all",
       doctor: doctorUser ? { username: doctorUser, password: cell(row, ci.doctorPass, where, "Doctor password") } : null,
       witness: witnessUser ? { username: witnessUser, password: cell(row, ci.witnessPass, where, "Witness password") } : null,
       accessUrl: cell(row, ci.accessUrl, where, "Access request link"),
@@ -169,7 +167,7 @@ export function fromWorkbook(sheets) {
     if (li.login === undefined) continue;
 
     const seen = new Map();
-    let noFin = 0, badMrn = 0;
+    let noFin = 0, badMrn = 0, badMode = 0;
     sheet.rows.slice(1).forEach((row, r) => {
       const where = `${whereTab}, row ${r + 2}`;
       const login = cell(row, li.login, where, "Login");
@@ -187,6 +185,9 @@ export function fromWorkbook(sheets) {
         const g = (f) => (f === "dob" ? dateCell : cell)(row, li[`${n}.${f}`], where, ptCol(n, f));
         const p = Object.fromEntries(Object.keys(PT_FIELDS).map((f) => [f, g(f)]));
         if (!(p.last || p.first || p.mrn)) continue;
+        const m = MODES.find(([id, label]) => id === norm(p.mode) || norm(label) === norm(p.mode));
+        if (p.mode && !m) badMode++;
+        p.mode = m ? m[0] : "instructor";
         if (p.mrn && !/^\d+$/.test(p.mrn)) badMrn++;
         if (c.barcode && !p.fin) noFin++;
         patients.push(p);
@@ -205,7 +206,7 @@ export function fromWorkbook(sheets) {
           label: cell(row, li.secondLabel, where, "Second login label") || "Second login",
           login: second,
           password: cell(row, li.secondPass, where, "Second login password"),
-          group: cell(row, li.secondGroup, where, "Second login tab / section"),
+          part: cell(row, li.secondPart, where, "Second login part"),
         } : null,
         patients,
         hbcis: hasHb ? hb : null,
@@ -214,8 +215,9 @@ export function fromWorkbook(sheets) {
 
     if (noFin) add("warning", whereTab, `${noFin} patient${noFin > 1 ? "s have" : " has"} no FIN, so no ID band barcode will show for ${noFin > 1 ? "them" : "it"}.`);
     if (badMrn) add("warning", whereTab, `${badMrn} MRN${badMrn > 1 ? "s contain" : " contains"} something other than numbers. Check for typos.`);
-    if (c.layout !== "all" && !c.logins.some((l) => l.patients.some((p) => p.group)))
-      add("warning", whereTab, `Patient layout is "${LAYOUTS.find((l) => l[0] === c.layout)[1]}", but no patient has a "Tab / section" filled in. All patients will show together.`);
+    if (badMode) add("warning", whereTab, `${badMode} patient${badMode > 1 ? "s have" : " has"} a Mode that isn't ${MODES.map((m) => m[1]).join(", ")}. Treated as Instructor led.`);
+    if (c.logins.length && !c.logins.some((l) => l.patients.some((p) => p.mode === "proficiency")) && c.logins.some((l) => l.patients.length))
+      add("info", whereTab, `"${c.name}" has no Proficiency patients, so the Proficiency button will show nothing for it.`);
     if (!c.logins.length) add("info", whereTab, `"${c.name}" has no logins yet, so it is hidden from trainees.`);
     else if (!c.show) add("info", whereTab, `"${c.name}" is set to "Show on site: No", so it is hidden from trainees.`);
   }
@@ -252,7 +254,7 @@ const README = [
   ["Show on site: No hides the course. Courses with no logins are hidden automatically."],
   ["Patient barcodes: Yes shows an ID band barcode made from \"AC\" + the patient's FIN."],
   ["Blood bag barcode: Yes shows the blood bag barcode on every card in the course."],
-  ["Patient layout: All together = every patient on one screen. Tabs = one tab per \"Tab / section\" value (e.g. Instructor led / Proficiency). Sections = one heading per value, all on one screen (e.g. Pharmacy Part A / Part B)."],
+  ["Live classes: the instructor picks a Part (when a course has parts) and flips between Instructor led and Proficiency. Trainees only see the patients that match."],
   ["Doctor / Witness: shown under \"Other logins\". Leave the username blank to hide it."],
   ["Access request link: the form opened by \"Course complete\". Leave blank to use the standard ServiceNow form."],
   [""],
@@ -261,8 +263,8 @@ const README = [
   ["Login and Password: what the trainee types into ieMR."],
   ["Facility: fill in to show facility buttons (e.g. CAB, TPCH) above the login list."],
   ["Doctor username (only if different): use when one login needs a different doctor to the Courses tab."],
-  ["Second login: a second login on the same card (e.g. Pharmacy Part B doctor login). \"Second login tab / section\" says which tab or section it belongs to."],
-  ["Pt1 to Pt6: up to six patients per login. A patient shows if it has a last name, first name or MRN. Role is the small label (e.g. Instructor led). DOB can be typed as a date."],
+  ["Second login: a second login on the same card (e.g. Pharmacy Part B doctor login). \"Second login part\" says which part it belongs to; it shows when the instructor is on that part."],
+  ["Pt1 to Pt6: up to six patients per login. A patient shows if it has a last name, first name or MRN. Mode is Instructor led, Proficiency or Always. Part is optional (e.g. Part A); patients with the same part are shown together. Label is an extra description (e.g. Birth Suite). DOB can be typed as a date."],
   ["IOMS: shown when filled in. HBCIS columns: shown as a separate HBCIS panel when filled in."],
   [""],
   ["Tips"],
@@ -275,7 +277,7 @@ export function toWorkbook(data) {
   const yn = (b) => (b ? "Yes" : "No");
   const courseRows = [COURSE_HEADERS, ...data.courses.map((c) => [
     c.tab, c.name, PROFESSIONS.find((p) => p[0] === c.group)?.[1] || "", yn(c.show !== false),
-    yn(c.barcode), yn(c.bloodBag), LAYOUTS.find((l) => l[0] === c.layout)?.[1] || "All together",
+    yn(c.barcode), yn(c.bloodBag),
     c.doctor?.username || "", c.doctor?.password || "", c.witness?.username || "", c.witness?.password || "",
     c.accessUrl || "", c.notes || "",
   ])];
@@ -286,31 +288,32 @@ export function toWorkbook(data) {
     const rows = [LOGIN_HEADERS, ...c.logins.map((l) => {
       const pts = Array.from({ length: MAX_PATIENTS }, (_, i) => {
         const p = l.patients[i] || {};
-        return Object.keys(PT_FIELDS).map((f) => p[f] || "");
+        return Object.keys(PT_FIELDS).map((f) => (f === "mode" ? (p[f] ? MODES.find((m) => m[0] === p[f])?.[1] || "" : "") : p[f] || ""));
       }).flat();
       const hb = l.hbcis || {};
       return [
         l.login, l.password, l.facility, l.doctor,
-        l.second?.label || "", l.second?.login || "", l.second?.password || "", l.second?.group || "",
+        l.second?.label || "", l.second?.login || "", l.second?.password || "", l.second?.part || "",
         ...pts,
         ...Object.keys(HBCIS_COLS).map((k) => hb[k] || ""),
       ];
     })];
     const widths = LOGIN_HEADERS.map((h) => Math.min(28, Math.max(10, h.length + 2)));
-    return { name: c.tab, rows, widths, freeze: true };
+    const modeCols = LOGIN_HEADERS.map((h, i) => (h.endsWith(" Mode") ? i : -1)).filter((i) => i >= 0);
+    const validations = modeCols.map((i) => ({ sqref: `${colName(i)}2:${colName(i)}500`, list: MODES.map((m) => m[1]) }));
+    return { name: c.tab, rows, widths, freeze: true, validations };
   });
 
   return [
     { name: "Read me", rows: README, widths: [120], wrap: true,
       rowStyles: Object.fromEntries(README.map((r, i) => [i, i === 0 || (README[i - 1]?.[0] === "" && r[0]) ? 3 : 2])) },
     { name: "Courses", rows: courseRows, freeze: true,
-      widths: [24, 34, 14, 12, 15, 16, 15, 18, 16, 18, 16, 40, 30],
+      widths: [24, 34, 14, 12, 15, 16, 18, 16, 18, 16, 40, 30],
       validations: [
         { sqref: range("Profession"), list: PROFESSIONS.map((p) => p[1]) },
         { sqref: range("Show on site"), list: YES_NO },
         { sqref: range("Patient barcodes"), list: YES_NO },
         { sqref: range("Blood bag barcode"), list: YES_NO },
-        { sqref: range("Patient layout"), list: LAYOUTS.map((l) => l[1]) },
       ] },
     ...courseTabs,
   ];
