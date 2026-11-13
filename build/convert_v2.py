@@ -14,6 +14,7 @@ Usage: python3 -I build/convert_v2.py <old.xlsx> <out.json>
 """
 import datetime
 import json
+import pathlib
 import string
 import sys
 
@@ -89,7 +90,12 @@ def rows(wb, sheet, login_col="B"):
     return out
 
 
-WITNESS = {"username": "Bloggs,Jo", "password": "train"}
+# Shared defaults (the standard training password, the witness login) are NOT kept in
+# this public repo. They live in data/defaults.json, which git ignores:
+#   {"password": "...", "witness": {"username": "...", "password": "..."}}
+DEFAULTS = json.loads((pathlib.Path(__file__).resolve().parent.parent / "data" / "defaults.json").read_text())
+PASSWORD = DEFAULTS["password"]
+WITNESS = DEFAULTS["witness"]
 
 
 def course(tab, name, group, *, barcode=False, blood=None, layout="all", witness=True,
@@ -103,14 +109,14 @@ def course(tab, name, group, *, barcode=False, blood=None, layout="all", witness
         "bloodBag": (group != "admin") if blood is None else blood,
         "layout": layout,
         "witness": dict(WITNESS) if witness else None,
-        "doctor": {"username": doctor, "password": "train"} if doctor else None,
+        "doctor": {"username": doctor, "password": PASSWORD} if doctor else None,
         "accessUrl": "",
         "notes": "",
         "logins": [],
     }
 
 
-def login(login_id, password="train", facility="", doctor="", patients=(), second=None, hbcis=None):
+def login(login_id, password=PASSWORD, facility="", doctor="", patients=(), second=None, hbcis=None):
     return {
         "login": login_id,
         "password": password,
@@ -139,7 +145,7 @@ def standard(wb, sheet, c, roles=("Instructor led", "Proficiency"), fallback_doc
     rs = rows(wb, sheet)
     default_doc = course_doctor(rs, "T", fallback_doctor)
     if default_doc:
-        c["doctor"] = {"username": default_doc, "password": "train"}
+        c["doctor"] = {"username": default_doc, "password": PASSWORD}
     for r in rs:
         doc = text(get(r, "T"))
         c["logins"].append(login(
@@ -174,7 +180,7 @@ def ao(wb, sheet, c, roles, hbcis_dob_col=None, hbcis_dob_fixed="", hbcis_extra=
                           ward=text(get(r, "AD")), transfer=text(get(r, "AE")))
         else:
             hb = None
-        c["logins"].append(login(text(get(r, "B")), password=text(get(r, "C")) or "train",
+        c["logins"].append(login(text(get(r, "B")), password=text(get(r, "C")) or PASSWORD,
                                  facility=text(get(r, "A")), patients=pts, hbcis=hb))
     return c
 
@@ -231,7 +237,7 @@ def main(src, out):
     # ObGyn: 3 instructor-led + 3 proficiency patients -> two card tabs.
     obgyn = course("MO ObGyn", "MO Obstetrics & Gynaecology", "medical", layout="tabs", witness=False)
     og = rows(wb, "2026 MO Obgyn Trg & Prof")
-    obgyn["doctor"] = {"username": course_doctor(og, "AL", "OB, Olly"), "password": "train"}
+    obgyn["doctor"] = {"username": course_doctor(og, "AL", "OB, Olly"), "password": PASSWORD}
     for r in og:
         obgyn["logins"].append(login(text(get(r, "B")), patients=[
             patient(r, "Instructor led", "Obs/Gyn", last="C", first="D", dob="E", mrn="F", ward="G"),
@@ -251,7 +257,7 @@ def main(src, out):
         part_b = text(get(r, "W"))
         ph["logins"].append(login(
             text(get(r, "B")),
-            second={"label": "Doctor login", "login": part_b, "password": "train", "group": "Part B: Doctor"} if part_b else None,
+            second={"label": "Doctor login", "login": part_b, "password": PASSWORD, "group": "Part B: Doctor"} if part_b else None,
             patients=[
                 patient(r, "Part A: Pharmacist", "Instructor led", **STD1),
                 patient(r, "Part A: Pharmacist", "Proficiency", **STD2),
