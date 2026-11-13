@@ -80,9 +80,7 @@ function listen(channelId, onChange, pollMs) {
   const topic = "tc-" + channelId;
   stopListening();
   try {
-    rt = rt || new window.TC.RealtimeClient(SUPABASE_URL.replace(/^http/, "ws") + "/realtime/v1", { params: { apikey: SUPABASE_KEY } });
-    rt.connect();
-    chan = rt.channel(topic);
+    chan = realtime().channel(topic);
     chan.on("broadcast", { event: "stage" }, () => onChange("stage"));
     chan.on("broadcast", { event: "roster" }, () => onChange("roster"));
     chan.subscribe();
@@ -96,7 +94,175 @@ function stopListening() {
   if (chan && rt) { try { rt.removeChannel(chan); } catch {} }
   chan = null; chanTopic = "";
 }
-document.addEventListener("visibilitychange", () => { if (!document.hidden && current.refresh) current.refresh(); });
+function realtime() {
+  rt = rt || new window.TC.RealtimeClient(SUPABASE_URL.replace(/^http/, "ws") + "/realtime/v1", { params: { apikey: SUPABASE_KEY } });
+  rt.connect();
+  return rt;
+}
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) return;
+  if (current.refresh) current.refresh();
+  if (chat.on) fetchChat();
+});
+
+/* ---------------- Trainer chat ----------------
+   One shared log for every signed-in instructor, at the top of the instructor pages.
+   Lives outside #view so class updates never wipe a half-typed message.
+   The display name lasts for the day on this computer. Wiped by the database every Friday 10 pm. */
+const chat = { on: false, last: 0, channel: "", rtChan: null, timer: null, classId: null, unread: 0, busy: false, again: false };
+const chatEl = $("#chat");
+const brisbaneDay = () => new Date().toLocaleDateString("en-CA", { timeZone: "Australia/Brisbane" });
+function chatName() {
+  try { const o = JSON.parse(store.get("tc-chat-name") || "null"); return o && o.day === brisbaneDay() ? o.name : ""; }
+  catch { return ""; }
+}
+function setChatName(n) { store.set("tc-chat-name", n ? JSON.stringify({ name: n, day: brisbaneDay() }) : null); }
+const chatOpen = () => store.get("tc-chat-open") !== "0";
+
+function chatShell() {
+  const name = chatName();
+  const open = chatOpen();
+  chatEl.innerHTML = `
+    <div class="chat-head">
+      <h2>Trainer chat</h2>
+      <span class="chat-note">All sites. No patient or personal information. Clears Fridays at 10 pm.</span>
+      <span class="chat-unread" id="chat-unread" ${chat.unread && !open ? "" : "hidden"}>${chat.unread} new</span>
+      <button class="text-btn" type="button" id="chat-toggle" aria-expanded="${open}">${open ? "Hide" : "Show"}</button>
+    </div>
+    <div id="chat-body" ${open ? "" : "hidden"}>
+      <div class="chat-log" id="chat-log" role="log" aria-live="polite" aria-label="Trainer messages">
+        <p class="chat-empty" id="chat-empty">No messages yet this week.</p>
+      </div>
+      ${name ? `
+      <form class="chat-form" id="chat-form" autocomplete="off">
+        <input class="input" id="chat-text" maxlength="500" placeholder="Message all trainers" aria-label="Message all trainers">
+        <button class="btn primary" type="submit">Send</button>
+      </form>
+      <p class="chat-as">Chatting as <b>${esc(name)}</b> <button class="text-btn" type="button" id="chat-rename">Change name</button></p>` : `
+      <form class="chat-form" id="chat-name-form" autocomplete="off">
+        <input class="input" id="chat-name" maxlength="40" placeholder="Your name for today, e.g. Sarah, RBWH" aria-label="Your name for today" required>
+        <button class="btn primary" type="submit">Start chatting</button>
+      </form>`}
+      <p class="form-error" id="chat-error" role="alert"></p>
+    </div>`;
+}
+
+function chatMessage(m) {
+  return `<div class="msg">
+    <div class="msg-meta"><b>${esc(m.name)}</b><time datetime="${esc(m.at)}">${time(m.at)}</time>${m.label ? `<span class="msg-label">${esc(m.label)}</span>` : ""}</div>
+    <p>${esc(m.body)}</p>
+  </div>`;
+}
+
+// One fetch at a time: a send and the live signal often ask together. A request made while
+// one is running is folded into a single follow-up fetch.
+async function fetchChat() {
+  if (chat.busy) { chat.again = true; return; }
+  chat.busy = true;
+  try { await fetchChatOnce(); } finally { chat.busy = false; }
+  if (chat.again) { chat.again = false; fetchChat(); }
+}
+async function fetchChatOnce() {
+  if (!chat.on || !staff.token) return;
+  let r;
+  try { r = await api("tc_chat", { p_token: staff.token, p_after: chat.last }); } catch { return; }
+  if (!r.ok) return;
+  if (r.channel !== chat.channel) {
+    // First load, or the Friday wipe rotated the channel: start the log fresh.
+    if (chat.channel) { chat.last = 0; chat.channel = ""; $("#chat-log").innerHTML = '<p class="chat-empty" id="chat-empty">No messages yet this week.</p>'; return fetchChatOnce(); }
+    chat.channel = r.channel;
+    subscribeChat();
+  }
+  const msgs = r.messages.filter((m) => m.id > chat.last);   // never show a message twice
+  if (!msgs.length) return;
+  const log = $("#chat-log");
+  if (!log) return;
+  const atBottom = log.scrollHeight - log.scrollTop - log.clientHeight < 40;
+  $("#chat-empty")?.remove();
+  log.insertAdjacentHTML("beforeend", msgs.map(chatMessage).join(""));
+  const fresh = chat.last ? msgs.length : 0;
+  chat.last = msgs[msgs.length - 1].id;
+  if (atBottom || !fresh) log.scrollTop = log.scrollHeight;
+  if (fresh && !chatOpen()) {
+    chat.unread += fresh;
+    const u = $("#chat-unread"); u.textContent = `${chat.unread} new`; u.hidden = false;
+  }
+}
+
+function subscribeChat() {
+  try {
+    if (chat.rtChan) realtime().removeChannel(chat.rtChan);
+    chat.rtChan = realtime().channel("tcstaff-" + chat.channel);
+    chat.rtChan.on("broadcast", { event: "message" }, () => fetchChat());
+    chat.rtChan.subscribe();
+  } catch {}
+}
+
+function startChat(classId) {
+  chat.classId = classId || null;
+  if (chat.on) { chatEl.hidden = false; return; }
+  chat.on = true; chat.last = 0; chat.channel = ""; chat.unread = 0;
+  chatShell();
+  chatEl.hidden = false;
+  fetchChat();
+  chat.timer = setInterval(() => { if (!document.hidden) fetchChat(); }, 20000);
+}
+function stopChat() {
+  chat.on = false;
+  clearInterval(chat.timer);
+  if (chat.rtChan && rt) { try { rt.removeChannel(chat.rtChan); } catch {} }
+  chat.rtChan = null;
+  chatEl.hidden = true;
+  chatEl.innerHTML = "";
+}
+
+chatEl.addEventListener("click", (e) => {
+  if (e.target.closest("#chat-toggle")) {
+    const open = !chatOpen();
+    store.set("tc-chat-open", open ? null : "0");
+    if (open) chat.unread = 0;
+    $("#chat-body").hidden = !open;
+    $("#chat-unread").hidden = true;
+    e.target.closest("#chat-toggle").textContent = open ? "Hide" : "Show";
+    e.target.closest("#chat-toggle").setAttribute("aria-expanded", open);
+    if (open) { const log = $("#chat-log"); log.scrollTop = log.scrollHeight; }
+  }
+  if (e.target.closest("#chat-rename")) {
+    setChatName(null);
+    const keep = $("#chat-log").innerHTML;
+    chatShell(); $("#chat-log").innerHTML = keep; $("#chat-name").focus();
+  }
+});
+chatEl.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  if (e.target.id === "chat-name-form") {
+    const n = $("#chat-name").value.trim();
+    if (!n) return;
+    setChatName(n);
+    const keep = $("#chat-log").innerHTML;
+    chatShell(); $("#chat-log").innerHTML = keep;
+    const log = $("#chat-log"); log.scrollTop = log.scrollHeight;
+    $("#chat-text").focus();
+    return;
+  }
+  if (e.target.id === "chat-form") {
+    const box = $("#chat-text");
+    const body = box.value.trim();
+    if (!body) return;
+    // Clear straight away so the next message can be typed while this one sends;
+    // put the text back only if sending fails.
+    box.value = "";
+    const restore = () => { if (!box.value.trim()) box.value = body; };
+    try {
+      const r = await staffApi("tc_chat_send", { p_name: chatName(), p_body: body, p_class: chat.classId });
+      if (!r.ok) { $("#chat-error").textContent = r.error; restore(); return; }
+      $("#chat-error").textContent = "";
+      await fetchChat();
+      const log = $("#chat-log"); log.scrollTop = log.scrollHeight;
+    } catch (err) { if (err.message !== "signed out") { $("#chat-error").textContent = err.message; restore(); } }
+    finally { box.focus(); }
+  }
+});
 
 /* ---------------- Routing ----------------
    #/                  join a class (trainee)
@@ -120,6 +286,7 @@ async function route() {
   view.onclick = null;
   closeOverlay();
   const parts = location.hash.replace(/^#\/?/, "").split("/").filter(Boolean);
+  if (!["instructor", "class"].includes(parts[0]) || !staff.token) stopChat();
   try {
     if (parts[0] === "card") return await showCard();
     if (parts[0] === "instructor") return parts[1] === "start" ? await showStart() : await showDashboard();
@@ -137,6 +304,7 @@ $("#home").addEventListener("click", () => go(!staff.token ? "#/" : staff.role =
 $("#signout").addEventListener("click", async () => {
   try { await api("tc_staff_logout", { p_token: staff.token }); } catch {}
   staff.clear();
+  stopChat();
   go("#/");
 });
 
@@ -358,6 +526,7 @@ async function showDashboard() {
   if (!staff.token || !["instructor", "admin"].includes(staff.role)) { setChrome(); await signinForm("instructor"); setChrome({ signout: true }); }
   const ov = await staffApi("tc_overview", {});
   overviewCache = ov;
+  startChat(null);
   const rows = ov.classes.map((c) => `
     <tr>
       <td><b>${esc(c.course)}</b>${c.facility ? `<br><span class="status waiting">${esc(c.facility)}</span>` : ""}</td>
@@ -388,6 +557,7 @@ async function showStart() {
   if (!staff.token) return go("#/instructor");
   setChrome({ signout: true });
   const ov = await staffApi("tc_overview", {});
+  startChat(null);
   const pick = { course: null, facility: "", trainees: 6, site: store.get("tc-site") || "" };
   const draw = (focus) => {
     const groups = GROUPS.map((g) => {
@@ -535,6 +705,7 @@ async function showClass(id) {
   };
   const r = await load();
   if (!r) return;
+  startChat(id);
   listen(r.class.channel, () => load(), 10000);
   current.refresh = load;
 

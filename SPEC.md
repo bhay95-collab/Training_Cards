@@ -76,6 +76,14 @@ An online version for testing on GitHub Pages: an instructor runs a class, train
 - **End class**: every trainee card closes and the logins return to the pool. Classes are for one day: at midnight Brisbane time every class still running ends and its logins return to the pool (a nightly pg_cron job, plus a date check on every request as a safety net).
 - **Admin**: download the data as Excel, load a changed spreadsheet (same plain-English checks), upload it (only when no class is live), change passwords.
 
+## Trainer chat
+- One shared chat log for every signed-in trainer, all sites, at the top of the instructor pages (Classes, Start a class, each class console). Trainees never see it.
+- No personal accounts: each trainer types a display name for the day (remembered on that computer until midnight). Messages sent from a class console are tagged with that class (course, site, code).
+- Live within about 2 seconds; a 20-second check catches up if the connection drops.
+- Up to 500 characters a message, 20 messages a minute per trainer. The panel reminds trainers: no patient or personal information.
+- Wiped every Friday at 10 pm Brisbane time (pg_cron); the live channel id rotates at the same time.
+- Security: messages live in `tc.messages` (no grants); read and sent only through `tc_chat` / `tc_chat_send` with an instructor token. The live signal carries only the new message id.
+
 ## Toggle mapping (agreed)
 | Course | Parts | Instructor led | Proficiency |
 | --- | --- | --- | --- |

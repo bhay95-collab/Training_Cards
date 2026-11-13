@@ -158,6 +158,33 @@
 .banner-msg.warn { background: var(--danger-wash); color: var(--danger-ink); }
 .banner-msg.ok { background: var(--live-wash); color: var(--success-ink); }
 
+/* Trainer chat: a compact log above the instructor pages */
+.chat {
+  margin-top: 16px; padding: 16px 20px; border-radius: 20px;
+  background: var(--surface); box-shadow: var(--shadow-sm);
+}
+.chat-head { display: flex; align-items: baseline; gap: 8px 16px; flex-wrap: wrap; }
+.chat-head h2 { margin: 0; font-size: 17px; font-weight: 700; letter-spacing: -0.015em; }
+.chat-note { font-size: 13px; color: var(--text-2); }
+.chat-unread { font-size: 13px; font-weight: 600; color: var(--teal); }
+.chat-head .text-btn { margin-left: auto; }
+.chat-log {
+  margin-top: 12px; max-height: 176px; overflow-y: auto; overscroll-behavior: contain;
+  border-top: 1px solid var(--line-soft); border-bottom: 1px solid var(--line-soft); padding: 4px 0;
+}
+.chat-empty { margin: 8px 0; font-size: 15px; color: var(--text-2); }
+.msg { padding: 8px 0; }
+.msg + .msg { border-top: 1px solid var(--line-soft); }
+.msg-meta { display: flex; align-items: baseline; gap: 4px 12px; flex-wrap: wrap; font-size: 13px; color: var(--text-2); }
+.msg-meta b { font-size: 15px; color: var(--text); }
+.msg-label { color: var(--teal); }
+.msg p { margin: 2px 0 0; font-size: 16px; overflow-wrap: break-word; white-space: pre-wrap; }
+.chat-form { display: flex; gap: 8px; margin-top: 12px; }
+.chat-form .input { flex: 1; min-width: 0; height: 44px; }
+.chat-as { margin: 8px 0 0; font-size: 13px; color: var(--text-2); }
+.chat-as .text-btn { font-size: 13px; margin-left: 8px; }
+.chat .form-error:empty { display: none; }
+
 @media (max-width: 960px) {
   .console { grid-template-columns: 1fr; }
 }
@@ -186,7 +213,10 @@
 
 <main>
   <noscript><p class="noscript">The Training Card needs JavaScript. Open it in Microsoft Edge with scripts allowed.</p></noscript>
-  <div class="wrap" id="view"></div>
+  <div class="wrap">
+    <section class="chat" id="chat" aria-label="Trainer chat" hidden></section>
+    <div id="view"></div>
+  </div>
 </main>
 
 <footer>
