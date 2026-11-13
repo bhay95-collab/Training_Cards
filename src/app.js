@@ -145,10 +145,9 @@ function renderCourses(groupId, active) {
     return `
     <button class="course" type="button" data-group="${c.group}" data-course="${c.id}"
             aria-pressed="${!!active && active.id === c.id}" style="animation-delay:${i * 40}ms">
-      <span class="eyebrow">${esc(g.name)}</span>
       <span class="title">${esc(c.name)}</span>
-      <span class="meta">${esc(bits.join(" · "))}</span>
-      <span class="cta">Choose login ›</span>
+      <span class="meta">${bits.map((b) => `<span>${esc(b)}</span>`).join("")}</span>
+      <span class="cta">Choose login</span>
       <span class="art">${icon(g.icon, 1.2)}</span>
     </button>`;
   }).join("");
@@ -182,7 +181,7 @@ const DASH = '<span class="v muted">—</span>';
 const BLOOD_BAG = { src: "data:image/png;base64,__BLOODBAG_PNG__", number: "A530-024-0384" };
 
 function copyBtn(label, value) {
-  return `<button class="copy" type="button" data-copy="${esc(value)}" aria-label="Copy ${esc(label)}">${COPY_ICON}</button>`;
+  return `<button class="copy" type="button" data-copy="${esc(value)}" aria-label="Copy ${esc(label)}" data-label="Copy ${esc(label)}">${COPY_ICON}</button>`;
 }
 function row(label, value, opts = {}) {
   const v = value ? `<span class="v ${opts.num ? "num" : ""}">${esc(value)}</span>` : DASH;
@@ -213,7 +212,7 @@ function patientCard(c, p, i) {
   <article class="patient" style="animation-delay:${60 + i * 60}ms">
     <div class="p-head">
       <div>
-        <div class="eyebrow">Patient ${i + 1}${p.role ? " · " + esc(p.role) : ""}</div>
+        <div class="p-tag"><b>Patient ${i + 1}</b>${p.role ? `<span>${esc(p.role)}</span>` : ""}</div>
         <div class="nm-label">Surname</div>
         <div class="name"><span>${esc(p.last || "—")}</span>${p.last ? copyBtn("surname", p.last) : ""}</div>
         ${p.first ? `<div class="nm-label">First name</div>
@@ -345,10 +344,10 @@ function showCard(c, l) {
     </div>`);
 
   $("#card-body").innerHTML = `
-    <div class="card-top"><button class="back" type="button" id="back">‹ ${esc(c.name)} logins</button></div>
+    <div class="card-top"><button class="back" type="button" id="back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>Back to logins</button></div>
     <section class="card-head">
       <div>
-        <div class="eyebrow">${same(g.name, c.name) ? "" : esc(g.name) + " · "}${esc(c.name)}${l.facility && c.facilities.length > 1 ? " · " + esc(l.facility) : ""}</div>
+        <div class="course-name">${esc(c.name)}${l.facility && c.facilities.length > 1 ? ", " + esc(l.facility) : ""}</div>
         <h1 class="num">${esc(l.login)}</h1>
       </div>
       <div class="creds">
@@ -428,9 +427,8 @@ async function copyText(text) {
 document.addEventListener("click", async (e) => {
   const b = e.target.closest(".copy"); if (!b) return;
   if (await copyText(b.dataset.copy)) {
-    b.classList.add("done"); b.innerHTML = TICK_ICON;
-    showToast(`Copied ${b.dataset.copy}`);
-    setTimeout(() => { b.classList.remove("done"); b.innerHTML = COPY_ICON; }, 1400);
+    b.classList.add("done"); b.innerHTML = TICK_ICON; b.setAttribute("aria-label", "Copied");
+    setTimeout(() => { b.classList.remove("done"); b.innerHTML = COPY_ICON; b.setAttribute("aria-label", b.dataset.label); }, 1400);
   }
 });
 
@@ -480,10 +478,10 @@ function renderResults() {
     ? (exactMulti ? `<div class="hint">${esc(exact)} is used in more than one place. Pick yours:</div>` : "") +
       hits.map((h, i) => {
         const shown = h.via ? h.l.second.login : h.l.login;
-        const where = [h.c.name, h.l.facility && h.c.facilities.length > 1 ? h.l.facility : "", h.via ? `${h.via} for ${h.l.login}` : ""].filter(Boolean).join(" · ");
+        const where = [h.c.name, h.l.facility && h.c.facilities.length > 1 ? h.l.facility : "", h.via ? `${h.via} for ${h.l.login}` : ""].filter(Boolean).join(", ");
         return `
       <button class="result" type="button" role="option" data-i="${i}" data-group="${h.c.group}" aria-selected="${i === sel}">
-        <span class="dot"></span>
+        <span class="r-icon">${icon(groupOf(h.c.group).icon, 2)}</span>
         <span class="login num">${esc(shown)}</span>
         <span class="r-course">${esc(where)}</span>
         <span class="go">›</span>
@@ -612,7 +610,7 @@ async function loadFile(file) {
   report.innerHTML = `<div class="verdict busy"><div><b>Checking ${esc(file.name)}…</b></div></div>`;
   let res;
   try {
-    if (!/\.xlsx$/i.test(file.name)) throw new Error("This needs to be an Excel .xlsx file. In Excel, use File › Save As › Excel Workbook (.xlsx).");
+    if (!/\.xlsx$/i.test(file.name)) throw new Error("This needs to be an Excel .xlsx file. In Excel, use File, then Save As, then Excel Workbook (.xlsx).");
     res = window.TC.fromWorkbook(await window.TC.readXlsx(await file.arrayBuffer()));
   } catch (err) {
     report.innerHTML = `<div class="verdict bad">${BAD_ICON}<div><b>Couldn't read this file</b><span>${esc(err.message)}</span></div></div>`;

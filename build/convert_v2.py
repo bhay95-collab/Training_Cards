@@ -199,8 +199,8 @@ def main(src, out):
 
     # ---------------- Midwifery ----------------
     C.append(standard(wb, "2026 MIDWIFERY DAY 1 Trg & Prof", course("Midwifery Day 1", "Midwifery Day 1", "midwifery", barcode=True),
-                      roles=("Antenatal · Training", "Postnatal · Training"), fallback_doctor="OB, Olly"))
-    C.append(standard(wb, "2026 MIDWIFERY DAY 2 Trg & Prof", course("Midwifery Day 2", "Midwifery Day 2 · Birth Suite", "midwifery", barcode=True),
+                      roles=("Antenatal (training)", "Postnatal (training)"), fallback_doctor="OB, Olly"))
+    C.append(standard(wb, "2026 MIDWIFERY DAY 2 Trg & Prof", course("Midwifery Day 2", "Midwifery Day 2: Birth Suite", "midwifery", barcode=True),
                       roles=("Training", "Proficiency"), fallback_doctor="OB, Olly"))
     C.append(course("Neonate", "Neonate", "midwifery", barcode=True, doctor="OB, Olly"))
 
@@ -251,12 +251,12 @@ def main(src, out):
         part_b = text(get(r, "W"))
         ph["logins"].append(login(
             text(get(r, "B")),
-            second={"label": "Doctor login", "login": part_b, "password": "train", "group": "Part B · Doctor"} if part_b else None,
+            second={"label": "Doctor login", "login": part_b, "password": "train", "group": "Part B: Doctor"} if part_b else None,
             patients=[
-                patient(r, "Part A · Pharmacist", "Instructor led", **STD1),
-                patient(r, "Part A · Pharmacist", "Proficiency", **STD2),
-                patient(r, "Part B · Doctor", "Instructor led", last="X", first="Y", dob="Z", mrn="AA", ward="AB"),
-                patient(r, "Part B · Doctor", "Proficiency", last="AD", first="AE", dob="AF", mrn="AG", ward="AH"),
+                patient(r, "Part A: Pharmacist", "Instructor led", **STD1),
+                patient(r, "Part A: Pharmacist", "Proficiency", **STD2),
+                patient(r, "Part B: Doctor", "Instructor led", last="X", first="Y", dob="Z", mrn="AA", ward="AB"),
+                patient(r, "Part B: Doctor", "Proficiency", last="AD", first="AE", dob="AF", mrn="AG", ward="AH"),
             ]))
     C.append(ph)
 
@@ -266,8 +266,8 @@ def main(src, out):
     # ---------------- Admin ----------------
     C.append(ao(wb, "2026 AO FirstNet ED", course("AO FirstNet ED", "AO FirstNet ED", "admin", witness=False),
                 ["Instructor led", "Short Term Treatment Area", "Ward", "Proficiency"], hbcis_dob_fixed="01-Jan-2000"))
-    C.append(ao(wb, "2026 AO FN VECS TRIAGE & DEPART", course("AO FirstNet VECS", "AO FirstNet VECS · Triage & Departure", "admin", witness=False),
-                ["Triage · Instructor led", "Triage · Proficiency", "Departure · Instructor led", "Departure · Proficiency"]))
+    C.append(ao(wb, "2026 AO FN VECS TRIAGE & DEPART", course("AO FirstNet VECS", "AO FirstNet VECS: Triage & Departure", "admin", witness=False),
+                ["Triage, instructor led", "Triage, proficiency", "Departure, instructor led", "Departure, proficiency"]))
     C.append(ao(wb, "2026 AO ESM", course("AO ESM", "AO ESM", "admin", witness=False),
                 ["Instructor led", "", "", ""]))
     C.append(ao(wb, "2026 AO Surgical Bookings", course("AO Surgical Bookings", "AO Surgical Bookings", "admin", witness=False),

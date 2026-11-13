@@ -1,0 +1,14 @@
+[
+ {
+  "mode": "redesign",
+  "depth": "polish",
+  "scope": "app",
+  "prompt": "Training Card: trainees find their ieMR training login and patients",
+  "waived": [
+   "29",
+   "38iii",
+   "39b"
+  ],
+  "date": "2026-11-13"
+ }
+]
