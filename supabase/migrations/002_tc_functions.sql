@@ -490,7 +490,7 @@ language plpgsql security definer set search_path = '' as $$
 begin
   if tc.role_of(p_token) is distinct from 'admin' then return tc.err('signed_out'); end if;
   if p_role not in ('instructor', 'admin') then return tc.err('Unknown role.'); end if;
-  if length(coalesce(p_new, '')) < 10 then return tc.err('Use at least 10 characters.'); end if;
+  if length(coalesce(p_new, '')) < 8 then return tc.err('Use at least 8 characters.'); end if;
   insert into tc.staff (role, pass_hash, updated_at) values (p_role, extensions.crypt(p_new, extensions.gen_salt('bf', 10)), now())
   on conflict (role) do update set pass_hash = excluded.pass_hash, updated_at = now();
   -- Changing a password signs everyone with that role out.

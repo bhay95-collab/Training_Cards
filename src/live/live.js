@@ -783,10 +783,10 @@ async function showAdmin() {
     </div></section>
     <section class="panel" style="margin-top:16px">
       <h2>Passwords</h2>
-      <p>At least 10 characters. Changing a password signs everyone using it out.</p>
+      <p>At least 8 characters. Changing a password signs everyone using it out.</p>
       <form id="pw-form" class="form-actions" style="margin-top:0">
         <select class="input" id="pw-role" aria-label="Which password"><option value="instructor">Instructor password</option><option value="admin">Admin password</option></select>
-        <input class="input" id="pw-new" type="password" autocomplete="new-password" placeholder="New password" aria-label="New password" minlength="10" required>
+        <input class="input" id="pw-new" type="password" autocomplete="new-password" placeholder="New password" aria-label="New password" minlength="8" required>
         <button class="btn secondary" type="submit">Change password</button>
       </form>
       <p class="form-error" id="pw-msg" role="status"></p>

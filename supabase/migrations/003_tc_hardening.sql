@@ -48,3 +48,6 @@ revoke execute on function tc.ip() from public, anon, authenticated;
 
 -- Roster lists logins in number order.
 -- (tc.class_json: order by a.kind, length(l.login), l.login — see 002.)
+
+-- Passwords: minimum length 8 (set from the admin screen). The instructor password itself is
+-- never stored in this repo; only its bcrypt hash lives in tc.staff.
