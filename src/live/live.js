@@ -389,7 +389,7 @@ async function showStart() {
   setChrome({ signout: true });
   const ov = await staffApi("tc_overview", {});
   const pick = { course: null, facility: "", trainees: 6, site: store.get("tc-site") || "" };
-  const draw = () => {
+  const draw = (focus) => {
     const groups = GROUPS.map((g) => {
       const cs = ov.courses.filter((c) => c.profession === g.id);
       if (!cs.length) return "";
@@ -404,14 +404,19 @@ async function showStart() {
     view.innerHTML = `
       <div class="card-top"><button class="back" type="button" data-go="#/instructor">${BACK_ICON}Back to classes</button></div>
       <header class="dash-head"><div><h1>Start a class</h1><p>You take the first free login. Trainees get the next ones.</p></div></header>
+      ${c ? `
+      <section class="panel picked" data-group="${esc(c.profession)}">
+        <div><span class="k">1. Course</span><b>${esc(c.name)}</b><span class="free">${c.free} of ${c.logins} logins free</span></div>
+        <button class="btn secondary nav-btn" type="button" data-change>Change course</button>
+      </section>` : `
       <section class="panel">
         <h2>1. Course</h2>
         <p>Pick the course you’re running today.</p>
         ${groups}
-      </section>
-      <section class="panel" ${c ? "" : 'style="opacity:.5"'}>
+      </section>`}
+      <section class="panel" id="details" ${c ? "" : 'style="opacity:.5"'}>
         <h2>2. Class details</h2>
-        <p>${c ? esc(c.name) : "Pick a course first."}</p>
+        <p>${c ? "Check these, then start the class." : "Pick a course first."}</p>
         ${c && c.facilities.length > 1 ? `<div class="field"><label>Facility</label><div class="chips">${c.facilities.map((f) => `<button class="chip" type="button" data-facility="${esc(f)}" aria-pressed="${pick.facility === f}">${esc(f)}</button>`).join("")}</div></div>` : ""}
         <div class="field">
           <label for="site">Site or room</label>
@@ -431,11 +436,17 @@ async function showStart() {
         <div class="form-actions"><button class="btn primary" type="button" id="start" ${c && (c.facilities.length < 2 || pick.facility) ? "" : "disabled"}>Start class</button></div>
       </section>
       <div style="height:64px"></div>`;
+    if (focus === "details") requestAnimationFrame(() => {
+      $("#details").scrollIntoView({ block: "start" });
+      ($("[data-facility]") || $("#site")).focus({ preventScroll: true });
+    });
+    if (focus === "top") window.scrollTo({ top: 0 });
   };
   draw();
   view.onclick = async (e) => {
     const cb = e.target.closest("[data-course]");
-    if (cb) { pick.course = ov.courses.find((c) => c.id === cb.dataset.course); pick.facility = ""; draw(); return; }
+    if (cb) { pick.course = ov.courses.find((c) => c.id === cb.dataset.course); pick.facility = ""; draw("details"); return; }
+    if (e.target.closest("[data-change]")) { pick.site = $("#site").value; pick.course = null; draw("top"); return; }
     const fb = e.target.closest("[data-facility]");
     if (fb) { pick.facility = fb.dataset.facility; pick.site = $("#site").value; draw(); return; }
     const sb = e.target.closest("[data-step]");

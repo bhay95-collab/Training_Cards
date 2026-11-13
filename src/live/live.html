@@ -111,6 +111,15 @@
 .course-pick b { font-size: 17px; font-weight: 700; letter-spacing: -0.015em; }
 .course-pick span { font-size: 13px; color: var(--on-tile); }
 .pick-group + .pick-group { margin-top: 24px; }
+/* Step 1 once a course is chosen: one line, in the course's colour */
+.panel.picked {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px 24px; flex-wrap: wrap;
+  background: var(--tile); box-shadow: none; padding: 16px 24px;
+}
+.picked .k { display: block; font-size: 13px; font-weight: 600; color: var(--on-tile-2); }
+.picked b { font-size: 21px; font-weight: 700; letter-spacing: -0.02em; margin-right: 12px; }
+.picked .free { font-size: 15px; color: var(--on-tile); }
+#details { scroll-margin-top: 64px; }
 .pick-group h3 { margin: 0; font-size: 17px; font-weight: 700; }
 
 /* Class console */

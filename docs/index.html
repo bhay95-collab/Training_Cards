@@ -68,8 +68,8 @@
   --warn: #8a5a00;
 
   /* Professions: tile colour and its ink */
-  --nursing-tile: #f5c6da;   --nursing-ink: #8c1d4f;
-  --medical-tile: #bcd6ee;   --medical-ink: #1e4f7c;
+  --nursing-tile: #bcd6ee;   --nursing-ink: #1e4f7c;
+  --medical-tile: #f5c6da;   --medical-ink: #8c1d4f;
   --midwifery-tile: #cfc0ee; --midwifery-ink: #4c2f8c;
   --admin-tile: #a6d8b5;     --admin-ink: #1f5e38;
   --pharmacy-tile: #fbe3a0;  --pharmacy-ink: #765600;
@@ -654,6 +654,15 @@ footer .wrap { display: flex; gap: 20px; flex-wrap: wrap; }
 .course-pick b { font-size: 17px; font-weight: 700; letter-spacing: -0.015em; }
 .course-pick span { font-size: 13px; color: var(--on-tile); }
 .pick-group + .pick-group { margin-top: 24px; }
+/* Step 1 once a course is chosen: one line, in the course's colour */
+.panel.picked {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px 24px; flex-wrap: wrap;
+  background: var(--tile); box-shadow: none; padding: 16px 24px;
+}
+.picked .k { display: block; font-size: 13px; font-weight: 600; color: var(--on-tile-2); }
+.picked b { font-size: 21px; font-weight: 700; letter-spacing: -0.02em; margin-right: 12px; }
+.picked .free { font-size: 15px; color: var(--on-tile); }
+#details { scroll-margin-top: 64px; }
 .pick-group h3 { margin: 0; font-size: 17px; font-weight: 700; }
 
 /* Class console */
@@ -1194,7 +1203,7 @@ async function showStart() {
   setChrome({ signout: true });
   const ov = await staffApi("tc_overview", {});
   const pick = { course: null, facility: "", trainees: 6, site: store.get("tc-site") || "" };
-  const draw = () => {
+  const draw = (focus) => {
     const groups = GROUPS.map((g) => {
       const cs = ov.courses.filter((c) => c.profession === g.id);
       if (!cs.length) return "";
@@ -1209,14 +1218,19 @@ async function showStart() {
     view.innerHTML = `
       <div class="card-top"><button class="back" type="button" data-go="#/instructor">${BACK_ICON}Back to classes</button></div>
       <header class="dash-head"><div><h1>Start a class</h1><p>You take the first free login. Trainees get the next ones.</p></div></header>
+      ${c ? `
+      <section class="panel picked" data-group="${esc(c.profession)}">
+        <div><span class="k">1. Course</span><b>${esc(c.name)}</b><span class="free">${c.free} of ${c.logins} logins free</span></div>
+        <button class="btn secondary nav-btn" type="button" data-change>Change course</button>
+      </section>` : `
       <section class="panel">
         <h2>1. Course</h2>
         <p>Pick the course you’re running today.</p>
         ${groups}
-      </section>
-      <section class="panel" ${c ? "" : 'style="opacity:.5"'}>
+      </section>`}
+      <section class="panel" id="details" ${c ? "" : 'style="opacity:.5"'}>
         <h2>2. Class details</h2>
-        <p>${c ? esc(c.name) : "Pick a course first."}</p>
+        <p>${c ? "Check these, then start the class." : "Pick a course first."}</p>
         ${c && c.facilities.length > 1 ? `<div class="field"><label>Facility</label><div class="chips">${c.facilities.map((f) => `<button class="chip" type="button" data-facility="${esc(f)}" aria-pressed="${pick.facility === f}">${esc(f)}</button>`).join("")}</div></div>` : ""}
         <div class="field">
           <label for="site">Site or room</label>
@@ -1236,11 +1250,17 @@ async function showStart() {
         <div class="form-actions"><button class="btn primary" type="button" id="start" ${c && (c.facilities.length < 2 || pick.facility) ? "" : "disabled"}>Start class</button></div>
       </section>
       <div style="height:64px"></div>`;
+    if (focus === "details") requestAnimationFrame(() => {
+      $("#details").scrollIntoView({ block: "start" });
+      ($("[data-facility]") || $("#site")).focus({ preventScroll: true });
+    });
+    if (focus === "top") window.scrollTo({ top: 0 });
   };
   draw();
   view.onclick = async (e) => {
     const cb = e.target.closest("[data-course]");
-    if (cb) { pick.course = ov.courses.find((c) => c.id === cb.dataset.course); pick.facility = ""; draw(); return; }
+    if (cb) { pick.course = ov.courses.find((c) => c.id === cb.dataset.course); pick.facility = ""; draw("details"); return; }
+    if (e.target.closest("[data-change]")) { pick.site = $("#site").value; pick.course = null; draw("top"); return; }
     const fb = e.target.closest("[data-facility]");
     if (fb) { pick.facility = fb.dataset.facility; pick.site = $("#site").value; draw(); return; }
     const sb = e.target.closest("[data-step]");
