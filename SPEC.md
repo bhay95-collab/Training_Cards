@@ -73,7 +73,7 @@ An online version for testing on GitHub Pages: an instructor runs a class, train
 - **Walk-ins**: the instructor adds a place; it takes the next free login.
 - **Logins are shared across sites**: a login can be in only one live class anywhere, so two sites running the same course never clash.
 - **Toggle**: the instructor picks a **Part** (only for courses with parts, e.g. Pharmacy Part A / Part B, AO VECS Triage / Departure, Anaesthetist Training / Blank Record) and flips **Instructor led / Proficiency**. Every trainee screen switches within a couple of seconds and shows only those patients.
-- **End class**: every trainee card closes and the logins return to the pool. Classes left running end automatically after 16 hours.
+- **End class**: every trainee card closes and the logins return to the pool. Classes are for one day: at midnight Brisbane time every class still running ends and its logins return to the pool (a nightly pg_cron job, plus a date check on every request as a safety net).
 - **Admin**: download the data as Excel, load a changed spreadsheet (same plain-English checks), upload it (only when no class is live), change passwords.
 
 ## Toggle mapping (agreed)

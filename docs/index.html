@@ -1294,7 +1294,7 @@ async function showClass(id) {
     view.innerHTML = `
       <div class="card-top"><button class="back" type="button" data-go="#/instructor">${BACK_ICON}All classes</button></div>
       <header class="dash-head">
-        <div><h1>${esc(data.course.name)}</h1><p>${esc([c.site, c.facility].filter(Boolean).join(", ") || "No site given")}. Started ${time(c.createdAt)}.</p></div>
+        <div><h1>${esc(data.course.name)}</h1><p>${esc([c.site, c.facility].filter(Boolean).join(", ") || "No site given")}. Started ${time(c.createdAt)}. Ends by itself at midnight.</p></div>
         <button class="btn danger-btn" type="button" id="end">End class</button>
       </header>
       <div class="console">
