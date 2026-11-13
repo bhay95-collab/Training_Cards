@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Training Card</title>
+<meta name="description" content="Join your ieMR training class and see your login and today’s patients.">
+<meta name="robots" content="noindex, nofollow">
+<style>
+/*__BASE_CSS__*/
+
+/* ================= Live classes ================= */
+:root {
+  --live: #1f8a4c;
+  --live-wash: #e5f4ea;
+  --danger-wash: #fdeaea;
+}
+
+/* Home: join or sign in */
+.join {
+  max-width: 640px; margin: 8px 0 48px;
+  background: var(--surface); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm);
+  padding: 32px;
+}
+.join h2 { margin: 0; font-size: 28px; font-weight: 700; letter-spacing: -0.025em; }
+.join p { margin: 8px 0 0; color: var(--text-2); }
+.join form { display: flex; gap: 12px; margin-top: 24px; flex-wrap: wrap; }
+.code-input {
+  flex: 1; min-width: 0; height: 64px; padding: 0 20px;
+  border: 1px solid var(--text-3); border-radius: 16px; background: var(--surface);
+  font: inherit; font-size: 32px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase;
+  font-variant-numeric: tabular-nums; color: var(--text); caret-color: var(--teal);
+  transition: border-color .2s var(--ease), box-shadow .2s var(--ease);
+}
+.code-input::placeholder { letter-spacing: 0; font-size: 19px; font-weight: 400; text-transform: none; color: var(--text-2); }
+.code-input:hover { border-color: var(--text-2); }
+.code-input:focus { outline: 0; border-color: var(--teal); box-shadow: 0 0 0 4px var(--teal-halo); }
+.join .btn { height: 64px; padding: 0 28px; font-size: 18px; }
+.form-error { margin: 12px 0 0; color: var(--danger-ink); font-size: 15px; min-height: 1lh; }
+.staff-links { display: flex; gap: 24px; flex-wrap: wrap; margin-bottom: 64px; }
+.text-btn { border: 0; background: none; padding: 4px 0; cursor: pointer; color: var(--teal); font-size: 15px; }
+.text-btn:hover { color: var(--teal-hover); text-decoration: underline; text-underline-offset: 3px; }
+
+/* Stage strip on the trainee card */
+.stage {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  margin: 0 0 16px; padding: 12px 16px; border-radius: 16px;
+  background: var(--surface); box-shadow: var(--shadow-sm);
+}
+.stage-label { font-size: 13px; color: var(--text-2); }
+.stage .mode-pill {
+  background: var(--ink); color: var(--on-dark); font-weight: 700; font-size: 17px;
+  padding: 4px 16px; border-radius: 999px;
+}
+.stage .part-name { font-weight: 600; }
+.stage .live-state { margin-left: auto; font-size: 13px; color: var(--text-2); }
+.stage.changed { animation: flash 1.2s var(--ease-out); }
+@keyframes flash { 0% { box-shadow: 0 0 0 4px var(--ink); } 100% { box-shadow: var(--shadow-sm); } }
+.leave { margin-top: 24px; }
+
+/* Instructor */
+.panel { background: var(--surface); border-radius: 24px; box-shadow: var(--shadow-sm); padding: 24px; }
+.panel + .panel { margin-top: 16px; }
+.panel h2 { margin: 0 0 4px; font-size: 21px; font-weight: 700; letter-spacing: -0.02em; }
+.panel > p { margin: 0 0 16px; color: var(--text-2); font-size: 15px; }
+.signin { max-width: 520px; }
+.field { display: grid; gap: 4px; margin-top: 16px; }
+.field label { font-size: 15px; font-weight: 600; }
+.field .hint { font-size: 13px; color: var(--text-2); }
+.input {
+  height: 48px; padding: 0 16px; border: 1px solid var(--text-3); border-radius: 12px; background: var(--surface);
+  font: inherit; font-size: 17px; color: var(--text); caret-color: var(--teal);
+  transition: border-color .2s var(--ease), box-shadow .2s var(--ease);
+}
+.input:hover { border-color: var(--text-2); }
+.input:focus { outline: 0; border-color: var(--teal); box-shadow: 0 0 0 4px var(--teal-halo); }
+.input:disabled { background: var(--bg); color: var(--text-2); cursor: not-allowed; opacity: .7; }
+.form-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 20px; align-items: center; }
+
+.dash-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; padding: 28px 0 24px; }
+.dash-head h1 { margin: 0; font-size: clamp(40px, 5vw, 56px); font-weight: 700; letter-spacing: -0.035em; color: var(--navy); }
+.dash-head p { margin: 4px 0 0; color: var(--text-2); }
+
+.live-table { width: 100%; border-collapse: collapse; font-size: 15px; }
+.live-table th, .live-table td { text-align: left; padding: 12px 8px; border-bottom: 1px solid var(--line-soft); vertical-align: middle; }
+.live-table th { font-size: 13px; font-weight: 600; color: var(--text-2); }
+.live-table td.n, .live-table th.n { text-align: right; font-variant-numeric: tabular-nums; }
+.live-table .code-cell { font-weight: 700; letter-spacing: .08em; font-variant-numeric: tabular-nums; }
+.empty-line { color: var(--text-2); font-size: 15px; padding: 8px 0; }
+
+.stepper { display: inline-flex; align-items: center; gap: 8px; }
+.stepper button {
+  width: 48px; height: 48px; border-radius: 12px; border: 1px solid var(--text-3); background: var(--surface);
+  font-size: 22px; font-weight: 600; cursor: pointer; color: var(--text);
+}
+.stepper button:hover { background: var(--fill-2); }
+.stepper button:active { transform: scale(.96); }
+.stepper button:disabled { opacity: .45; cursor: not-allowed; }
+.stepper output { min-width: 56px; text-align: center; font-size: 28px; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+.course-pick { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; margin-top: 16px; }
+.course-pick button {
+  text-align: left; padding: 16px 20px; border: 0; border-radius: 18px; cursor: pointer;
+  background: var(--tile); min-height: 88px; display: flex; flex-direction: column; justify-content: space-between; gap: 8px;
+  transition: transform .2s var(--ease-out), box-shadow .2s var(--ease-out);
+}
+.course-pick button:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+.course-pick button:active { transform: scale(.98); }
+.course-pick button[aria-pressed="true"] { box-shadow: 0 0 0 3px var(--bg), 0 0 0 5px var(--ink); }
+.course-pick button:disabled { opacity: .5; cursor: not-allowed; }
+.course-pick b { font-size: 17px; font-weight: 700; letter-spacing: -0.015em; }
+.course-pick span { font-size: 13px; color: var(--on-tile); }
+.pick-group + .pick-group { margin-top: 24px; }
+.pick-group h3 { margin: 0; font-size: 17px; font-weight: 700; }
+
+/* Class console */
+.console { display: grid; grid-template-columns: minmax(0, 1fr) minmax(300px, 400px); gap: 16px; align-items: start; }
+.code-panel { text-align: left; }
+.code-panel .big-code {
+  font-size: clamp(56px, 8vw, 96px); font-weight: 700; letter-spacing: .12em; line-height: 1;
+  font-variant-numeric: tabular-nums; color: var(--navy); margin: 8px 0 4px; overflow-wrap: anywhere;
+}
+.code-panel p { margin: 0; color: var(--text-2); font-size: 15px; }
+.controls h3 { margin: 16px 0 8px; font-size: 15px; font-weight: 600; color: var(--text-2); }
+.controls h3:first-child { margin-top: 0; }
+.big-seg { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 4px; padding: 4px; background: var(--fill-3); border-radius: 16px; }
+.big-seg button {
+  min-height: 56px; padding: 8px 16px; border: 0; border-radius: 12px; cursor: pointer; background: transparent;
+  font-size: 17px; font-weight: 600; color: var(--text-2);
+  transition: background .2s var(--ease), color .2s var(--ease), box-shadow .2s var(--ease);
+}
+.big-seg button:hover { color: var(--text); }
+.big-seg button:active { transform: scale(.98); }
+.big-seg button[aria-pressed="true"] { background: var(--navy); color: var(--on-dark); box-shadow: var(--shadow-xs); }
+.big-seg button:disabled { opacity: .45; cursor: not-allowed; }
+.controls .note { font-size: 13px; color: var(--text-2); margin: 8px 0 0; }
+.roster-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 8px; }
+.roster-head h2 { margin: 0; }
+.status { font-size: 14px; }
+.status.joined { color: var(--live); font-weight: 600; }
+.status.waiting { color: var(--text-2); }
+.row-actions { display: flex; gap: 12px; justify-content: flex-end; }
+.danger-btn { background: transparent; color: var(--danger); box-shadow: inset 0 0 0 1px var(--danger); }
+.danger-btn:hover { background: var(--danger-wash); }
+.instructor-card { margin-top: 24px; }
+.instructor-card > h2 { margin: 0 0 12px; font-size: 21px; font-weight: 700; letter-spacing: -0.02em; }
+
+.banner-msg { padding: 12px 16px; border-radius: 12px; margin: 0 0 16px; font-size: 15px; }
+.banner-msg.warn { background: var(--danger-wash); color: var(--danger-ink); }
+.banner-msg.ok { background: var(--live-wash); color: var(--success-ink); }
+
+@media (max-width: 960px) {
+  .console { grid-template-columns: 1fr; }
+}
+@media (max-width: 720px) {
+  .join { padding: 24px; }
+  .code-input { font-size: 26px; }
+  .join .btn { width: 100%; }
+}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap">
+    <button class="brand" id="home" type="button" aria-label="Training Card home">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M7 10h5M7 14h3"/><circle cx="16" cy="12" r="2"/></svg>
+      </span>
+      Training Card
+    </button>
+    <span class="nav-note" id="nav-note">Training data only. Not real patients.</span>
+    <button class="btn primary nav-btn" id="complete-open" type="button" hidden>Course complete</button>
+    <button class="btn secondary nav-btn" id="signout" type="button" hidden>Sign out</button>
+  </div>
+</header>
+
+<main>
+  <noscript><p class="noscript">The Training Card needs JavaScript. Open it in Microsoft Edge with scripts allowed.</p></noscript>
+  <div class="wrap" id="view"></div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span id="footer-note">Training environment data. Do not use for real patient care.</span>
+  </div>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<dialog class="modal" id="complete" aria-labelledby="complete-title">
+  <div data-step="ask">
+    <div class="m-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 4 6v6c0 4.5 3.4 8.3 8 9 4.6-.7 8-4.5 8-9V6l-8-3Z"/><path d="m8.5 12 2.5 2.5 4.5-5"/></svg></div>
+    <h2 id="complete-title">Course complete?</h2>
+    <p>Has your trainer signed you off for this course?</p>
+    <div class="actions">
+      <button class="btn secondary" type="button" data-answer="no">No, not yet</button>
+      <button class="btn primary" type="button" data-answer="yes">Yes, I’m signed off</button>
+    </div>
+  </div>
+  <div data-step="yes" hidden>
+    <div class="m-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg></div>
+    <h2>Request your access</h2>
+    <p>The access request form is opening in a new tab. Fill it in and submit it to request your access.</p>
+    <div class="actions">
+      <a class="btn secondary" id="access-link" href="#" target="_blank" rel="noopener">Didn’t open? Open form</a>
+      <button class="btn primary" type="button" data-close>Done</button>
+    </div>
+  </div>
+  <div data-step="no" hidden>
+    <div class="m-icon amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12Z"/></svg></div>
+    <h2>Chat with your trainer</h2>
+    <p>Talk with your trainer about what’s still needed and agree on your next steps. Come back here once you’ve been signed off.</p>
+    <div class="actions">
+      <button class="btn primary" type="button" data-close>OK</button>
+    </div>
+  </div>
+</dialog>
+
+<dialog class="modal" id="confirm" aria-labelledby="confirm-title">
+  <h2 id="confirm-title"></h2>
+  <p id="confirm-text"></p>
+  <div class="actions">
+    <button class="btn secondary" type="button" value="cancel" data-confirm="no">Cancel</button>
+    <button class="btn primary" type="button" data-confirm="yes" id="confirm-yes"></button>
+  </div>
+</dialog>
+
+<script>/*__LIB__*/</script>
+<script>/*__APP__*/</script>
+</body>
+</html>

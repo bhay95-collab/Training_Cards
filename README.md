@@ -20,6 +20,17 @@ Both open on the second screen; on a PC with only one screen they use that scree
 They find `TrainingCard.html` next to the launcher first, then on the user's Desktop. Running one again
 closes its old windows and opens fresh ones.
 
+## Live classes (this branch)
+
+The online version lives in `src/live/` and is built into `docs/` for GitHub Pages:
+
+```bash
+node build/build-live.mjs
+```
+
+Database setup is in `supabase/migrations/` (apply in order). Course data is loaded from the spreadsheet with
+`TC_ADMIN_PASSWORD=... NODE_USE_ENV_PROXY=1 node build/upload.mjs`, or from the site's admin screen (`#/admin`).
+
 ## For developers
 
 Needs Node 18+ and Python 3 with openpyxl (only for the one-off conversion).

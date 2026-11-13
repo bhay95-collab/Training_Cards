@@ -60,3 +60,40 @@ Replaces the Excel "Digital Training Card – Trainee Copy v2.0" with one web pa
 ## Open
 - How often data is updated (designed for occasional use).
 - Do training PCs reset on reboot? (affects any "remember this PC" feature — not in scope)
+
+---
+
+# Live classes (branch `claude/live-class-mode`)
+
+An online version for testing on GitHub Pages: an instructor runs a class, trainee PCs join with a code, logins are handed out automatically, and the instructor switches what every trainee sees.
+
+## Flow
+- **Instructor**: signs in with the shared instructor password, starts a class (course, facility if the course has several, site or room, trainees booked). Gets a 6-character **class code**. Takes the **first free login**; trainees get the next ones.
+- **Trainee PC**: opens the site, types the code, and is given the next free login for that class. Refreshing keeps the same login. A full class tells the trainee to ask for a place.
+- **Walk-ins**: the instructor adds a place; it takes the next free login.
+- **Logins are shared across sites**: a login can be in only one live class anywhere, so two sites running the same course never clash.
+- **Toggle**: the instructor picks a **Part** (only for courses with parts, e.g. Pharmacy Part A / Part B, AO VECS Triage / Departure, Anaesthetist Training / Blank Record) and flips **Instructor led / Proficiency**. Every trainee screen switches within a couple of seconds and shows only those patients.
+- **End class**: every trainee card closes and the logins return to the pool. Classes left running end automatically after 16 hours.
+- **Admin**: download the data as Excel, load a changed spreadsheet (same plain-English checks), upload it (only when no class is live), change passwords.
+
+## Toggle mapping (agreed)
+| Course | Parts | Instructor led | Proficiency |
+| --- | --- | --- | --- |
+| 2-patient courses | none | Patient 1 | Patient 2 |
+| MO ObGyn | none | the instructor-led three | the proficiency three |
+| Pharmacy | Part A, Part B | the part's Patient 1 | the part's Patient 2 |
+| AO FirstNet VECS | Triage, Departure | the part's instructor-led patient | the part's proficiency patient |
+| MO Anaesthetist | Training, Blank Record | the part's Patient 1 | the part's Patient 2 |
+| AO FirstNet ED | none | ILT, STTA, Ward | Proficiency |
+| AO ESM | none | A, B, C | D |
+| Midwifery Day 1 | none | Antenatal + Postnatal (training) | Antenatal + Postnatal (proficiency) |
+| HBCIS patients | – | always shown | always shown |
+
+## Security
+- Database: Supabase project (reused "Unstuck"), private schema `tc`. RLS on every table with no policies; no table grants to the public roles; the schema is not exposed by the API.
+- The site can only call `public.tc_*` functions (SECURITY DEFINER, empty search_path). Each checks a staff token or a trainee device id and returns only what that caller may see. A trainee PC sees only its own login and the current patients.
+- Staff passwords are bcrypt hashes; session tokens are random, stored as SHA-256 hashes and expire after 14 hours. Failed sign-ins (8 per 15 min) and wrong class codes (30 per 15 min) are rate-limited per address.
+- Live updates are broadcast on a secret per-class channel and carry only "the toggle changed", never patient data.
+- The page published on GitHub Pages holds no course data (the build refuses if it finds any). The publishable key in it can only reach the tc_* functions.
+- The repo is public, so shared defaults (standard password, witness login) live only in the database and in `data/defaults.json`, which git ignores.
+- Data region: Singapore (the reused project). A live QH version should move to Sydney or QH infrastructure.

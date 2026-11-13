@@ -31,3 +31,20 @@ begin
 end $$;
 -- Event-trigger helper left from the old project: never needs to be called through the API.
 revoke execute on function public.rls_auto_enable() from public, anon, authenticated;
+
+-- Rate limits key on the caller's address. Prefer headers set by the edge (Cloudflare),
+-- which a caller can't forge, before the client-extendable X-Forwarded-For.
+create or replace function tc.ip() returns text
+language sql stable set search_path = '' as $$
+  with h as (select nullif(current_setting('request.headers', true), '')::json as j)
+  select coalesce(
+    nullif(trim(j ->> 'cf-connecting-ip'), ''),
+    nullif(trim(j ->> 'x-real-ip'), ''),
+    nullif(trim(split_part(coalesce(j ->> 'x-forwarded-for', ''), ',', 1)), ''),
+    'unknown')
+  from h
+$$;
+revoke execute on function tc.ip() from public, anon, authenticated;
+
+-- Roster lists logins in number order.
+-- (tc.class_json: order by a.kind, length(l.login), l.login — see 002.)

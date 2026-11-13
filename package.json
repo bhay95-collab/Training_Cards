@@ -9,6 +9,7 @@
   },
   "devDependencies": {
     "@fontsource-variable/inter": "5.3.0",
+    "@supabase/realtime-js": "2.11.15",
     "bwip-js": "4.11.4",
     "esbuild": "0.25.12"
   }
